@@ -151,37 +151,44 @@
     .panel { padding: 24px; }
     .scoreboard { padding: 18px; }
   }
-  /* Keep both teams visible side by side on phones, with compact controls. */
+  /* Mobile: keep both teams side by side while removing nested card boxes. */
   @media (max-width: 679px) {
-    .team-entry-wrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
-    .team-entry { min-width: 0; margin-top: 10px; padding: 9px; border-radius: 15px; }
-    .entry-team-title { align-items: flex-start; flex-wrap: wrap; gap: 5px; font-size: .88rem; margin-bottom: 10px; }
+    body { padding-left: 12px; padding-right: 12px; }
+    .panel { padding: 16px; }
+    .team-entry-wrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; width: 100%; }
+    .team-entry { min-width: 0; margin-top: 8px; padding: 0; border: 0 !important; border-radius: 0; box-shadow: none; background: transparent; }
+    .team-entry, .team-entry * { min-width: 0; }
+    .entry-team-title { align-items: center; flex-wrap: wrap; gap: 5px; font-size: .9rem; margin: 0 0 12px; }
     .entry-team-title .tag { font-size: .61rem; padding: 4px 5px; }
-    .card-count-title { padding: 10px 12px; font-size: .82rem; line-height: 1.25; border-radius: 12px; }
-    .card-count-section { border: 0; border-radius: 0; overflow: visible; }
-    .card-count-section .count-body { padding: 4px 0 0; }
-    .count-row { grid-template-columns: minmax(0, 1fr) 34px 24px 34px; gap: 5px; padding: 5px 0; border-bottom: 0; }
-    .count-label { font-size: .76rem; overflow-wrap: normal; word-break: normal; }
-    .count-btn { min-height: 36px; font-size: 1.05rem; border-radius: 10px; }
-    .count-value { font-size: .88rem; }
-    .count-total { border-radius: 10px; padding: 9px 10px; font-size: .78rem; }
-    .bonus-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .card-count-section { margin-top: 15px; border: 0; border-radius: 0; overflow: visible; background: transparent; }
+    .card-count-title { padding: 8px 0; font-size: .84rem; line-height: 1.25; border-radius: 0; background: transparent; color: var(--bg); border-bottom: 1px solid var(--line); }
+    .card-count-section.hand .card-count-title { background: transparent; color: #93621f; }
+    .card-count-section .count-body { padding: 5px 0 0; }
+    .count-row { grid-template-columns: minmax(0, 1fr) 30px 20px 30px; gap: 4px; padding: 7px 0; border: 0; }
+    .count-label { min-width: 0; font-size: .7rem; overflow-wrap: anywhere; word-break: normal; }
+    .count-btn { min-height: 34px; font-size: 1rem; border-radius: 9px; }
+    .count-value { font-size: .8rem; }
+    .count-total { display: block; padding: 8px 0; font-size: .72rem; background: transparent; border-top: 1px solid var(--line); }
+    .count-total strong { display: block; margin-top: 3px; }
+    .bonus-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 9px; }
+    .bonus-grid .field { min-width: 0; }
     .bonus-grid .field label { font-size: .7rem; line-height: 1.2; min-height: 2.4em; }
-    .bonus-grid .field input[type="number"] { padding: 8px 5px; font-size: .88rem; }
+    .bonus-grid .field input[type="number"] { width: 100%; padding: 9px 3px; font-size: .9rem; text-align: center; }
     .field-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .field label { font-size: .74rem; }
-    .field input[type="number"] { padding: 9px 8px; font-size: .94rem; }
-    .check-row { align-items: flex-start; gap: 6px; padding: 9px 7px; font-size: .73rem; line-height: 1.3; }
+    .field input[type="number"] { width: 100%; padding: 10px 8px; font-size: .94rem; }
+    .check-row { align-items: flex-start; gap: 7px; padding: 10px 0; font-size: .74rem; line-height: 1.3; border-radius: 0; background: transparent; border-bottom: 1px solid var(--line); }
     .check-row input { width: 18px; height: 18px; }
-    .count-row { grid-template-columns: minmax(0, 1fr) 30px 20px 30px; gap: 3px; padding: 5px 0; }
-    .count-label { min-width: 0; font-size: .68rem; overflow-wrap: normal; word-break: normal; }
-    .count-btn { min-height: 32px; font-size: 1rem; border-radius: 8px; }
-    .count-value { font-size: .78rem; }
-    .count-total { flex-wrap: wrap; gap: 4px; padding: 8px 5px; font-size: .7rem; }
-    .live-score { padding: 9px 8px; gap: 4px; }
+    .live-score { padding: 9px 0; gap: 4px; background: transparent; border-radius: 0; border-top: 1px solid var(--line); }
     .live-score span:first-child { font-size: .74rem; }
     .live-score strong { font-size: 1.05rem; }
-    .team-entry .card-count-section { margin-top: 9px; }
+    .team-entry .card-count-section { margin-top: 15px; }
+    .team-entry .field-grid { gap: 7px; }
+    .team-entry .field input[type="number"] { max-width: 100%; }
+    .team-entry .bonus-section .card-count-title { color: #a34f70; }
+    .team-entry .bonus-section .count-body { padding-top: 3px; }
+    .team-entry .check-row { margin-top: 8px; }
+    .team-entry .field { min-width: 0; }
   }
   @media (max-width: 520px) { .action-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 360px) {
