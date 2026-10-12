@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#174e4f">
+<title>Canasta — Scorepad</title>
+<style>
+  :root {
+    --bg: #174e4f;
+    --bg-dark: #103b3c;
+    --ink: #252d2b;
+    --muted: #687572;
+    --line: #e1e8e4;
+    --white: #fffefa;
+    --orange: #a34f70;
+    --orange-soft: #f8eaf0;
+    --blue: #b27a2d;
+    --blue-soft: #fbf1df;
+    --green: #237653;
+    --red: #a63838;
+    --shadow: 0 7px 18px rgba(19, 54, 48, .12);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--ink); background: #e9f0eb;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: max(14px, env(safe-area-inset-top)) 13px max(25px, env(safe-area-inset-bottom));
+  }
+  button, input { font: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+  .app { max-width: 900px; margin: 0 auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 2px 18px; color: white; }
+  .brand { font-size: clamp(1.6rem, 6vw, 2.35rem); font-weight: 850; letter-spacing: -.045em; line-height: 1.05; }
+  .offline-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.28); border-radius: 30px; background: rgba(255,255,255,.12); font-size: .72rem; font-weight: 750; white-space: nowrap; }
+  .dot { width: 7px; height: 7px; background: #8ff0b8; border-radius: 50%; display: inline-block; }
+  .panel { background: var(--white); border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
+  .scoreboard { padding: 16px; }
+  .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .team-score { min-width: 0; padding: 15px 14px 13px; border-radius: 22px; color: white; text-align: center; }
+  .team-score.a { background: #a34f70; }
+  .team-score.b { background: #b27a2d; }
+  .team-name { width: 100%; min-width: 0; border: 0; background: transparent; color: white; font-weight: 800; text-align: center; font-size: 1rem; padding: 2px 0 4px; overflow-wrap:anywhere; }
+  .team-name-fields input[type="text"], #playersPanel input[type="text"] { width:100%; min-width:0; padding:11px 10px; border:1px solid #dfe2eb; background:#fbfcff; border-radius:11px; font:inherit; color:var(--ink); }
+  
+  .total { font-weight: 850; font-size: clamp(2.3rem, 9vw, 3.2rem); line-height: 1.13; letter-spacing: -.04em; margin: 1px 0 8px; overflow-wrap: anywhere; }
+  .progress-track { height: 8px; background: rgba(255,255,255,.45); border-radius: 20px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: inherit; background: rgba(255,255,255,.95); width: 0%; transition: width .2s ease; }
+  .progress-line { display: flex; justify-content: space-between; gap: 8px; color: rgba(255,255,255,.95); font-size: .75rem; font-weight: 700; padding-top: 7px; }
+  .score-goal { text-align: center; color: var(--muted); font-size: .92rem; font-weight: 800; margin: 15px 0 12px; }
+  .action-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .action-row .action { min-width: 0; font-size: .82rem; }
+  .action.new-game { background: #f4e5d1; color: #6d4b22; box-shadow: none; }
+  .action.archives { background: #dcebe5; color: #174e4f; box-shadow: none; }
+  .action { border: 0; border-radius: 15px; background: var(--bg); color: white; min-height: 63px; padding: 10px 5px; cursor: pointer; font-weight: 800; box-shadow: 0 3px 0 rgba(30,45,120,.13); }
+  .action .emoji { display: block; font-size: 1.35rem; line-height: 1.1; margin-bottom: 4px; }
+  .action.secondary { background: #eef0ff; color: #4053ad; box-shadow: none; }
+  .action.danger { background: #fff0ef; color: var(--red); box-shadow: none; }
+  .status { display: none; margin-top: 13px; padding: 12px 14px; border-radius: 13px; background: #eaf8ef; color: #17663f; font-weight: 750; }
+  .status.show { display: block; }
+  .status.warn { background: #fff3d9; color: #7a5100; }
+  .section-title { display: flex; align-items: center; gap: 10px; font-size: 1.22rem; font-weight: 850; color: var(--bg); margin: 0 0 15px; letter-spacing: -.02em; }
+  .section-title .icon { font-size: 1.5rem; line-height: 1; }
+  .divider { height: 1px; background: var(--line); margin: 0 0 15px; }
+  .meld-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .meld-box { background: #f7f8ff; border: 1px solid #ebedfa; border-radius: 15px; padding: 13px 14px; }
+  .meld-box .team-label { font-weight: 850; color: var(--bg); }
+  .meld-value { font-weight: 850; font-size: 1.65rem; padding-top: 3px; }
+  .hint { color: var(--muted); font-size: .82rem; line-height: 1.45; }
+  .entry-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .entry-heading .section-title { margin-bottom: 0; }
+  .small-btn { border: 0; border-radius: 10px; background: #eef0ff; color: #4053ad; padding: 8px 11px; font-weight: 800; font-size: .83rem; cursor: pointer; }
+  .team-entry { border: 1px solid var(--line); border-radius: 18px; padding: 15px; margin-top: 13px; }
+  .team-entry.a { border-top: 5px solid #a34f70; }
+  .team-entry.b { border-top: 5px solid #b27a2d; }
+  .entry-team-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 1.08rem; font-weight: 850; margin-bottom: 13px; }
+  .entry-team-title .tag { font-size: .72rem; padding: 5px 8px; background: #f3f4f8; color: var(--muted); border-radius: 8px; font-weight: 750; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .field { min-width: 0; }
+  .field label { display: block; font-size: .81rem; font-weight: 750; color: #565968; margin-bottom: 6px; line-height: 1.25; }
+  .field input[type="number"] { width: 100%; min-width: 0; padding: 12px 10px; border: 1px solid #dfe2eb; background: #fbfcff; border-radius: 11px; font-size: 1.05rem; font-weight: 750; color: var(--ink); outline-color: var(--bg); }
+  .field input[type="number"]::-webkit-inner-spin-button { opacity: .5; }
+  .card-count-section { margin-top: 13px; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; }
+  .card-count-title { margin: 0; padding: 10px 12px; background: #a34f70; color: white; font-size: .96rem; font-weight: 850; }
+  .card-count-section.hand .card-count-title { background: #b27a2d; }
+  .stepper { display:grid; grid-template-columns: 38px 1fr 38px; align-items:center; gap:6px; }
+  .stepper-value { text-align:center; font-weight:800; font-size:1.05rem; font-variant-numeric:tabular-nums; }
+  .stepper-btn { border:0; border-radius:10px; background:#f0f1f5; min-height:38px; font-size:1.2rem; font-weight:800; cursor:pointer; }
+  .card-count-section > .card-count-title { cursor:pointer; list-style:none; }
+  .card-count-section > .card-count-title:after { content:'＋'; float:right; }
+  .card-count-section.expanded > .card-count-title:after { content:'−'; }
+  .count-body { display:none; }
+  .card-count-section.expanded .count-body { display:block; }
+  .round-edit { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+  .round-edit summary { font-size:.92rem; }
+  .edit-team { border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:10px; }
+  .edit-team h4 { margin:0 0 8px; }
+  .edit-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .edit-fields label { font-size:.76rem; font-weight:700; display:block; margin-bottom:4px; }
+  .edit-fields input { width:100%; min-width:0; padding:8px; border:1px solid #dfe2eb; border-radius:8px; }
+  .round-edit-actions { display:flex; gap:8px; margin-top:10px; }
+  .count-row { display: grid; grid-template-columns: minmax(78px, 1fr) 40px 28px 40px; align-items: center; gap: 6px; padding: 7px 9px; border-bottom: 1px solid var(--line); }
+  .count-row:last-child { border-bottom: 0; }
+  .count-label { font-size: .84rem; font-weight: 750; }
+  .count-value { text-align: center; font-variant-numeric: tabular-nums; }
+  .count-btn { border: 0; border-radius: 10px; background: #f0f1f5; min-height: 38px; font-size: 1.2rem; font-weight: 800; cursor: pointer; }
+  .count-total { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px; background: #f7f8ff; font-size: .86rem; font-weight: 850; }
+  .bonus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 11px; }
+  .bonus-grid .field input[type="number"] { padding: 10px 8px; }
+  .check-row { display: flex; align-items: center; gap: 10px; margin-top: 13px; padding: 11px 12px; border-radius: 11px; background: #f7f8fc; font-weight: 750; font-size: .9rem; cursor: pointer; }
+  .check-row input { width: 21px; height: 21px; accent-color: var(--bg); flex-shrink: 0; }
+  .live-score { display: flex; justify-content: space-between; gap: 10px; align-items: center; background: #f4f5ff; border-radius: 12px; padding: 11px 13px; margin-top: 12px; }
+  .live-score span:first-child { color: #626579; font-size: .85rem; font-weight: 750; }
+  .live-score strong { color: var(--bg); font-size: 1.25rem; }
+  .save-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-top: 15px; }
+  .save-btn { border: 0; border-radius: 13px; background: var(--bg); color: white; padding: 15px 12px; font-weight: 850; cursor: pointer; min-height: 52px; }
+  .clear-btn { border: 0; border-radius: 13px; background: #f1f2f6; color: #55596a; padding: 15px 14px; font-weight: 800; cursor: pointer; }
+  .history-item { border: 1px solid var(--line); border-radius: 15px; padding: 13px; margin-top: 10px; }
+  .history-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .history-date { font-weight: 850; }
+  .history-sub { color: var(--muted); font-size: .79rem; margin-top: 2px; }
+  .history-deltas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .delta { border-radius: 10px; padding: 9px 10px; font-weight: 850; font-size: .94rem; }
+  .delta.a { background: var(--orange-soft); color: #793650; }
+  .delta.b { background: var(--blue-soft); color: #80551a; }
+  .history-breakdown { color: var(--muted); font-size: .78rem; margin-top: 8px; line-height: 1.45; }
+  .delete-round { border: 0; border-radius: 9px; padding: 7px 9px; background: #fff0ef; color: var(--red); font-weight: 850; cursor: pointer; }
+  .empty { color: var(--muted); text-align: center; padding: 20px 8px 8px; }
+  details { border-radius: 16px; }
+  details summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 850; color: var(--bg); font-size: 1.08rem; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary:after { content: '+'; font-size: 1.5rem; line-height: 1; }
+  details[open] summary:after { content: '−'; }
+  .rules-content { padding-top: 15px; }
+  .rules-block { margin: 14px 0; }
+  .rules-block h3 { font-size: .95rem; margin: 0 0 7px; color: #5055a8; }
+  .rules-block ul { margin: 0; padding-left: 21px; color: #4c4e58; }
+  .rules-block li { padding: 3px 0; line-height: 1.4; }
+  .backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px; }
+  .backup-btn { border: 1px solid #dfe2ef; background: #f7f8ff; color: #4555a8; border-radius: 11px; min-height: 43px; padding: 10px; font-weight: 800; cursor: pointer; }
+  #importFile { display: none; }
+  .footnote { color: rgba(255,255,255,.88); font-size: .77rem; text-align: center; line-height: 1.5; padding: 0 10px 8px; }
+  .hidden { display: none !important; }
+  @media (min-width: 680px) {
+    body { padding-left: 22px; padding-right: 22px; }
+    .scoreboard { padding: 22px; }
+    .team-entry-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .team-entry { margin-top: 13px; }
+    .panel { padding: 24px; }
+    .scoreboard { padding: 18px; }
+  }
+  @media (max-width: 520px) { .action-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 360px) {
+    body { padding-left: 9px; padding-right: 9px; }
+    .panel { padding: 15px; border-radius: 20px; }
+    .team-score { padding-left: 8px; padding-right: 8px; }
+    .bonus-grid { gap: 6px; }
+    .bonus-grid .field label { font-size: .74rem; }
+    .team-entry { padding: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <a href="../../index.html" aria-label="Back to Scorepad home" style="color:white;text-decoration:none;font-size:.9rem;font-weight:800;border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:9px 11px;white-space:nowrap">← Home</a>
+      <div class="brand">Canasta</div>
+    </div>
+    <div class="offline-pill"><span class="dot"></span> OFFLINE · AUTO-SAVE</div>
+  </header>
+
+  <section class="panel" id="playersPanel">
+    <details open>
+      <summary>Players &amp; first turn</summary>
+      <div class="rules-content">
+        <p class="hint">Each team can have one or two players. Enter team and player names. In a two-player game, the starter alternates automatically. With four players, choose starters for the first two rounds; rotation is automatic after that.</p>
+        <div class="field-grid team-name-fields">
+          <div class="field"><label for="nameA">Team A name</label><input id="nameA" type="text" maxlength="22" value="Team A" placeholder="Team name"></div>
+          <div class="field"><label for="nameB">Team B name</label><input id="nameB" type="text" maxlength="22" value="Team B" placeholder="Team name"></div>
+        </div>
+        <div class="field-grid" style="margin-top:12px">
+          <div class="field"><label for="aPlayer1">Team A · Player 1</label><input id="aPlayer1" type="text" maxlength="30" placeholder="Player name"></div>
+          <div class="field"><label for="aPlayer2">Team A · Player 2 (optional)</label><input id="aPlayer2" type="text" maxlength="30" placeholder="Player name"></div>
+          <div class="field"><label for="bPlayer1">Team B · Player 1</label><input id="bPlayer1" type="text" maxlength="30" placeholder="Player name"></div>
+          <div class="field"><label for="bPlayer2">Team B · Player 2 (optional)</label><input id="bPlayer2" type="text" maxlength="30" placeholder="Player name"></div>
+        </div>
+        <div class="field" style="margin-top:12px"><label for="gameStarter">Who started the game?</label><select id="gameStarter" style="width:100%;padding:12px;border:1px solid #dfe2eb;border-radius:11px;background:#fbfcff;font:inherit"></select></div>
+      </div>
+    </details>
+  </section>
+
+
+  <section class="panel scoreboard" aria-label="Scoreboard">
+    <div class="teams">
+      <div class="team-score a">
+        <div class="team-name" id="scoreLabelA">Team A</div>
+        <div class="total" id="scoreA">0</div>
+        <div class="progress-track"><div class="progress-fill" id="progressA"></div></div>
+        <div class="progress-line"><span id="pctA">0%</span><span>of 5,000</span></div>
+      </div>
+      <div class="team-score b">
+        <div class="team-name" id="scoreLabelB">Team B</div>
+        <div class="total" id="scoreB">0</div>
+        <div class="progress-track"><div class="progress-fill" id="progressB"></div></div>
+        <div class="progress-line"><span id="pctB">0%</span><span>of 5,000</span></div>
+      </div>
+    </div>
+    <div class="score-goal" id="gameStatus">Progress to 5,000 points</div>
+    <div class="action-row">
+      <button class="action" id="focusEntry"><span class="emoji">＋</span>Add round</button>
+      <button class="action secondary" id="focusHistory"><span class="emoji">▤</span>History</button>
+      <button class="action danger" id="undoLast"><span class="emoji">↶</span>Undo last</button>
+      <button class="action new-game" id="newGame"><span class="emoji">＋</span>New game</button>
+      <button class="action archives" id="pastGames"><span class="emoji">▣</span>Past games</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </section>
+
+
+  <section class="panel">
+    <h2 class="section-title"><span class="icon">↗</span> Minimum melding</h2>
+    <div class="divider"></div>
+    <div class="meld-grid">
+      <div class="meld-box"><div class="team-label" id="meldNameA">Team A</div><div class="meld-value" id="meldA">50 points</div><div class="hint" id="meldHintA">Current score under 1,500</div></div>
+      <div class="meld-box"><div class="team-label" id="meldNameB">Team S</div><div class="meld-value" id="meldB">50 points</div><div class="hint" id="meldHintB">Current score under 1,500</div></div>
+    </div>
+  </section>
+
+  <section class="panel" id="entryPanel">
+    <div class="entry-heading">
+      <h2 class="section-title"><span class="icon">＋</span> Enter round scores</h2>
+      <button class="small-btn" id="resetFields" type="button">Clear fields</button>
+    </div>
+    <p class="hint" style="margin:8px 0 3px">Enter the card points and bonuses for each team. Round totals update automatically.</p>
+    <form id="scoreForm">
+      <div class="field" style="margin:12px 0"><label for="roundStarter">Who started this round?</label><select id="roundStarter" style="width:100%;padding:12px;border:1px solid #dfe2eb;border-radius:11px;background:#fbfcff;font:inherit"></select></div>
+      <div class="team-entry-wrap">
+        <div class="team-entry a">
+          <div class="entry-team-title"><span id="entryNameA">Team A</span><span class="tag">TEAM 1</span></div>
+          <div class="field-grid">
+            <div class="field"><label for="aMeld">Extra meld points (optional)</label><input id="aMeld" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+            <div class="field"><label for="aHand">Extra hand points to subtract (optional)</label><input id="aHand" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+          </div>
+          <div class="bonus-grid">
+            <div class="field"><label>Natural canastas</label><div class="stepper" id="aNaturalStepper" data-target="aNatural"></div><input id="aNatural" type="hidden" value="0"></div>
+            <div class="field"><label>Mixed canastas</label><div class="stepper" id="aMixedStepper" data-target="aMixed"></div><input id="aMixed" type="hidden" value="0"></div>
+            <div class="field"><label>Red 3s (0–4)</label><div class="stepper" id="aRed3Stepper" data-target="aRed3"></div><input id="aRed3" type="hidden" value="0"></div>
+          </div>
+          <label class="check-row"><input id="aOut" type="checkbox"> Went out this round (+100)</label>
+          <div class="live-score"><span>Round score</span><strong id="aRoundTotal">0</strong></div>
+        </div>
+        <div class="team-entry b">
+          <div class="entry-team-title"><span id="entryNameB">Team S</span><span class="tag">TEAM 2</span></div>
+          <div class="field-grid">
+            <div class="field"><label for="bMeld">Extra meld points (optional)</label><input id="bMeld" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+            <div class="field"><label for="bHand">Extra hand points to subtract (optional)</label><input id="bHand" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+          </div>
+          <div class="bonus-grid">
+            <div class="field"><label>Natural canastas</label><div class="stepper" id="bNaturalStepper" data-target="bNatural"></div><input id="bNatural" type="hidden" value="0"></div>
+            <div class="field"><label>Mixed canastas</label><div class="stepper" id="bMixedStepper" data-target="bMixed"></div><input id="bMixed" type="hidden" value="0"></div>
+            <div class="field"><label>Red 3s (0–4)</label><div class="stepper" id="bRed3Stepper" data-target="bRed3"></div><input id="bRed3" type="hidden" value="0"></div>
+          </div>
+          <label class="check-row"><input id="bOut" type="checkbox"> Went out this round (+100)</label>
+          <div class="live-score"><span>Round score</span><strong id="bRoundTotal">0</strong></div>
+        </div>
+      </div>
+      <div class="save-row">
+        <button class="save-btn" type="submit">Save round scores</button>
+        <button class="clear-btn" type="button" id="clearRound">Reset</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel" id="historyPanel">
+    <div class="entry-heading">
+      <h2 class="section-title"><span class="icon">▤</span> Round history</h2>
+      <span class="hint" id="roundCount">0 rounds</span>
+    </div>
+    <div class="divider" style="margin-top:14px"></div>
+    <div id="historyList"><div class="empty">No rounds recorded yet. Add your first round above.</div></div>
+  </section>
+
+  <section class="panel">
+    <details>
+      <summary>Rules &amp; card values</summary>
+      <div class="rules-content">
+        <div class="rules-block"><h3>Card values</h3><ul>
+          <li>Jokers = 50 points</li><li>Aces and 2s = 20 points</li><li>Kings through 8s = 10 points</li><li>7s through 4s = 5 points</li><li>Black 3s = 5 points</li>
+        </ul></div>
+        <div class="rules-block"><h3>Minimum meld (based on team score)</h3><ul>
+          <li>Under 1,500 points = 50-point meld</li><li>1,500–2,999 points = 90-point meld</li><li>3,000+ points = 120-point meld</li>
+        </ul></div>
+        <div class="rules-block"><h3>Canasta basics</h3><ul>
+          <li>Seven cards of the same rank make a canasta.</li><li>Natural canasta = 500 bonus points; mixed canasta = 300 bonus points.</li><li>Jokers and 2s are wildcards.</li><li>Black 3s block the discard pile; wildcards freeze the discard pile.</li><li>Red 3s score 100 points each, or 800 points for all four.</li><li>Going out earns 100 bonus points. A team needs at least one canasta to go out.</li>
+        </ul></div>
+        <div class="rules-block"><h3>Game setup &amp; winning</h3><ul>
+          <li>4 players in 2 teams of 2; deal 11 cards to each player.</li><li>Use 2 standard 52-card decks and 4 jokers. Put remaining cards face down as the draw pile, then turn over the top card to start the discard pile.</li><li>The first team to reach 5,000 points wins, subject to the canasta/going-out rule.</li>
+        </ul></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2 class="section-title"><span class="icon">⬇</span> Backup &amp; restore</h2>
+    <p class="hint" style="margin:0">Scores auto-save in this browser on this device. Export a backup occasionally, especially before clearing browser data or moving the HTML file.</p>
+    <div class="backup-grid">
+      <button class="backup-btn" id="exportBtn" type="button">Export backup</button>
+      <button class="backup-btn" id="importBtn" type="button">Restore backup</button>
+      <input id="importFile" type="file" accept="application/json,.json">
+    </div>
+  </section>
+  <p class="footnote">Runs offline · No account or internet required<br>For reliable auto-save, reopen this file in the same browser on the same device.</p>
+</div>
+<script>
+(() => {
+'use strict';
+const STORAGE_KEY='canasta-scorekeeper-v1'; const $=id=>document.getElementById(id);
+const num=id=>Math.max(0,parseInt($(id)?.value||'0',10)||0);
+const ids=['aMeld','aHand','aNatural','aMixed','aRed3','aOut','bMeld','bHand','bNatural','bMixed','bRed3','bOut'];
+const ranks=[{key:'J',label:'Jokers',points:50},{key:'2',label:'2s',points:20},{key:'A',label:'Aces',points:20},{key:'K8',label:'Kings–8s',points:10},{key:'74',label:'7s–4s',points:5},{key:'B3',label:'Black 3s',points:5}];
+const playerIds=['aPlayer1','aPlayer2','bPlayer1','bPlayer2'];
+let state={names:['Team A','Team B'],players:['','','',''],gameStarter:'',roundStarter:'',rounds:[],pastGames:[]}; let storageWorks=true;
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageWorks=true}catch(e){storageWorks=false}return storageWorks}
+function status(msg,warn=false){const n=$('status');n.textContent=msg;n.className='status show'+(warn?' warn':'');clearTimeout(status.timer);status.timer=setTimeout(()=>n.classList.remove('show'),4500)}
+function scoreFmt(n){return Math.round(Number(n)||0).toLocaleString('en-US')}
+function fmt(n){n=Math.round(Number(n)||0);return (n>0?'+':'')+n.toLocaleString('en-US')}
+function red3Points(n){return n===4?800:n*100}
+function getCounts(prefix,section){const o={};ranks.forEach(r=>o[r.key]=num(prefix+section+r.key));return o}
+function countPoints(counts){return ranks.reduce((s,r)=>s+(Number(counts?.[r.key])||0)*r.points,0)}
+function cardCountPoints(prefix,section){return countPoints(getCounts(prefix,section))}
+function getTeam(prefix){return {meldExtra:num(prefix+'Meld'),handExtra:num(prefix+'Hand'),meldCards:getCounts(prefix,'MeldCount'),handCards:getCounts(prefix,'HandCount'),meld:num(prefix+'Meld')+cardCountPoints(prefix,'MeldCount'),hand:num(prefix+'Hand')+cardCountPoints(prefix,'HandCount'),natural:num(prefix+'Natural'),mixed:num(prefix+'Mixed'),red3:Math.min(4,num(prefix+'Red3')),out:$(prefix+'Out').checked}}
+function delta(t){return t.meld-t.hand+t.natural*500+t.mixed*300+red3Points(t.red3)+(t.out?100:0)}
+function teamTotal(i){return state.rounds.reduce((s,r)=>s+Number(i===0?r.aDelta:r.bDelta),0)}
+function canastas(i,extra){return state.rounds.reduce((s,r)=>s+(i===0?r.a.natural+r.a.mixed:r.b.natural+r.b.mixed),0)+(extra?extra.natural+extra.mixed:0)}
+function minMeld(n){return n>=3000?120:n>=1500?90:50}
+function updateNames(){state.names=[ $('nameA').value.trim()||'Team A',$('nameB').value.trim()||'Team B'];$('meldNameA').textContent=state.names[0];$('meldNameB').textContent=state.names[1];$('entryNameA').textContent=state.names[0];$('entryNameB').textContent=state.names[1];updateScoreLabels();save()}
+function updateScoreLabels(){const ps=players();$('scoreLabelA').textContent=ps[0]||state.names[0];$('scoreLabelB').textContent=ps[2]||state.names[1];$('scoreLabelA').title=state.names[0];$('scoreLabelB').title=state.names[1]}
+function players(){return playerIds.map(id=>$(id).value.trim())}
+function rebuildStarterOptions(){const ps=players();const options=[];ps.forEach((name,i)=>{if(name)options.push({value:String(i),label:name+' ('+(i===0||i===1?state.names[0]:state.names[1])+')'})});const fill=(sel,selected,placeholder)=>{const old=selected??sel.value;sel.innerHTML='';const opt=document.createElement('option');opt.value='';opt.textContent=placeholder;sel.appendChild(opt);options.forEach(o=>{const x=document.createElement('option');x.value=o.value;x.textContent=o.label;sel.appendChild(x)});if([...sel.options].some(o=>o.value===String(old)))sel.value=String(old)};fill($('gameStarter'),state.gameStarter,'Select first player');const roundChoice=state.roundStarter!==''?state.roundStarter:(state.rounds.length===0?state.gameStarter:'');fill($('roundStarter'),roundChoice,'Select round starter');}
+function activePlayers(){return players().map((name,i)=>({name,index:i})).filter(p=>p.name)}
+function nextStarterAfter(savedStarter, roundCount){const ps=activePlayers();if(ps.length<2)return '';const current=Number(savedStarter);if(!Number.isInteger(current)||!ps.some(p=>p.index===current))return '';if(ps.length===2){return String(ps.find(p=>p.index!==current)?.index??'')}if(roundCount<2)return '';const pos=ps.findIndex(p=>p.index===current);return String(ps[(pos+1)%ps.length].index)}
+function updatePlayers(){state.players=players();state.gameStarter=$('gameStarter').value;state.roundStarter=$('roundStarter').value;save()}
+function renderScoreboard(){const a=teamTotal(0),b=teamTotal(1);$('scoreA').textContent=scoreFmt(a);$('scoreB').textContent=scoreFmt(b);['A','B'].forEach((x,i)=>{const v=i?b:a;$(('progress'+x)).style.width=Math.max(0,Math.min(100,v/50))+'%';$('pct'+x).textContent=Math.max(0,Math.round(v/50))+'%'});$('meldA').textContent=minMeld(a)+' points';$('meldB').textContent=minMeld(b)+' points';$('meldHintA').textContent='Current score: '+scoreFmt(a);$('meldHintB').textContent='Current score: '+scoreFmt(b);let msg='Progress to 5,000 points';if(a>=5000&&canastas(0)>0)msg='🏆 '+state.names[0]+' has reached 5,000 points!';else if(b>=5000&&canastas(1)>0)msg='🏆 '+state.names[1]+' has reached 5,000 points!';else if(a>=5000)msg=state.names[0]+' reached 5,000 but still needs a canasta to go out.';else if(b>=5000)msg=state.names[1]+' reached 5,000 but still needs a canasta to go out.';$('gameStatus').textContent=msg}
+function renderLive(){['a','b'].forEach(p=>{const t=getTeam(p);$(''+p+'RoundTotal').textContent=fmt(delta(t));const m=$(p+'MeldCountTotal'),h=$(p+'HandCountTotal');if(m)m.textContent=scoreFmt(t.meld)+' pts';if(h)h.textContent=scoreFmt(t.hand)+' pts'})}
+function buildStepper(id,max=999){const host=$(id+'Stepper');if(!host)return;host.innerHTML='';const minus=document.createElement('button');minus.type='button';minus.className='stepper-btn';minus.textContent='−';const value=document.createElement('span');value.className='stepper-value';value.textContent='0';const plus=document.createElement('button');plus.type='button';plus.className='stepper-btn';plus.textContent='+';const update=d=>{const v=Math.max(0,Math.min(max,num(id)+d));$(id).value=v;value.textContent=v;renderLive()};minus.onclick=()=>update(-1);plus.onclick=()=>update(1);host.append(minus,value,plus)}
+function buildCardCounters(prefix){const team=document.querySelector('.team-entry.'+(prefix==='a'?'a':'b'));const bonus=team.querySelector('.bonus-grid');const make=(section,title,cls)=>{const box=document.createElement('div');box.className='card-count-section '+cls;const heading=document.createElement('h4');heading.className='card-count-title';heading.textContent=title;heading.tabIndex=0;heading.setAttribute('role','button');heading.setAttribute('aria-expanded','false');const body=document.createElement('div');body.className='count-body';const toggle=()=>{box.classList.toggle('expanded');heading.setAttribute('aria-expanded',box.classList.contains('expanded'))};heading.onclick=toggle;heading.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}};box.append(heading,body);ranks.forEach(r=>{const row=document.createElement('div');row.className='count-row';const label=document.createElement('span');label.className='count-label';label.textContent=r.label+' ('+r.points+' pts)';const minus=document.createElement('button');minus.type='button';minus.className='count-btn';minus.textContent='−';const val=document.createElement('span');val.className='count-value';val.id=prefix+section+r.key+'Value';val.textContent='0';const plus=document.createElement('button');plus.type='button';plus.className='count-btn';plus.textContent='+';const inp=document.createElement('input');inp.type='hidden';inp.id=prefix+section+r.key;inp.value='0';const change=d=>{inp.value=Math.max(0,num(inp.id)+d);val.textContent=inp.value;renderLive()};minus.onclick=()=>change(-1);plus.onclick=()=>change(1);row.append(label,minus,val,plus,inp);body.appendChild(row)});const total=document.createElement('div');total.className='count-total';total.innerHTML='<span>Calculated card points</span><strong id="'+prefix+section+'Total">0 pts</strong>';body.appendChild(total);return box};const meld=make('MeldCount','Melded hands · count cards','meld'),hand=make('HandCount','Cards left · count cards','hand');const bonusBox=document.createElement('div');bonusBox.className='card-count-section bonus-section expanded';const bonusTitle=document.createElement('h4');bonusTitle.className='card-count-title';bonusTitle.textContent='Canasta bonuses & going out';bonusTitle.tabIndex=0;bonusTitle.setAttribute('role','button');bonusTitle.setAttribute('aria-expanded','true');const bonusBody=document.createElement('div');bonusBody.className='count-body';const goingOut=team.querySelector('.check-row');bonusTitle.onclick=()=>{bonusBox.classList.toggle('expanded');bonusTitle.setAttribute('aria-expanded',bonusBox.classList.contains('expanded'))};bonusTitle.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();bonusTitle.click()}};bonusBody.append(bonus,goingOut);bonusBox.append(bonusTitle,bonusBody);const firstFields=team.querySelector('.field-grid');team.insertBefore(bonusBox,firstFields);team.insertBefore(meld,bonusBox.nextSibling);team.insertBefore(hand,meld.nextSibling)}
+function clearInputs(){ids.forEach(id=>{if(id.endsWith('Out'))$(id).checked=false;else $(id).value='0'});document.querySelectorAll('.card-count-section input[type=hidden]').forEach(n=>n.value='0');document.querySelectorAll('.count-value').forEach(n=>n.textContent='0');document.querySelectorAll('.card-count-section').forEach(n=>{n.classList.remove('expanded');n.querySelector('summary')?.setAttribute('aria-expanded','false')});renderLive();save()}
+function createEditField(container,label,value,onchange,type='number'){const wrap=document.createElement('div'),lab=document.createElement('label'),input=document.createElement('input');lab.textContent=label;input.type=type;input.value=value??0;if(type==='number'){input.min='0';input.step='1'}input.addEventListener('change',()=>onchange(type==='number'?Math.max(0,Number(input.value)||0):input.value));wrap.append(lab,input);container.appendChild(wrap)}
+function renderHistory(){const list=$('historyList');$('roundCount').textContent=state.rounds.length+(state.rounds.length===1?' round':' rounds');list.innerHTML='';if(!state.rounds.length){list.innerHTML='<div class="empty">No rounds recorded yet. Add your first round above.</div>';return} [...state.rounds].reverse().forEach((r,rev)=>{const i=state.rounds.length-1-rev,item=document.createElement('div');item.className='history-item';const top=document.createElement('div');top.className='history-top';const left=document.createElement('div'),title=document.createElement('div'),date=document.createElement('div');title.className='history-date';title.textContent='Round '+(i+1);date.className='history-sub';const d=new Date(r.time);date.textContent=Number.isNaN(d.getTime())?'':d.toLocaleString([],{dateStyle:'medium',timeStyle:'short'});left.append(title,date);const del=document.createElement('button');del.className='delete-round';del.type='button';del.textContent='Delete';del.onclick=()=>{if(confirm('Delete round '+(i+1)+'?')){state.rounds.splice(i,1);save();render();status('Round deleted.')}};top.append(left,del);const deltas=document.createElement('div');deltas.className='history-deltas';const da=document.createElement('div'),db=document.createElement('div');da.className='delta a';db.className='delta b';da.textContent=state.names[0]+': '+fmt(r.aDelta);db.textContent=state.names[1]+': '+fmt(r.bDelta);deltas.append(da,db);const starter=document.createElement('div');starter.className='history-sub';starter.textContent='Started by: '+(r.starterName||'Not recorded');const breakdown=document.createElement('div');breakdown.className='history-breakdown';breakdown.textContent=state.names[0]+': meld '+scoreFmt(r.a.meld)+' − hand '+scoreFmt(r.a.hand)+', natural '+r.a.natural+', mixed '+r.a.mixed+', red 3s '+r.a.red3+(r.a.out?', went out':'')+' · '+state.names[1]+': meld '+scoreFmt(r.b.meld)+' − hand '+scoreFmt(r.b.hand)+', natural '+r.b.natural+', mixed '+r.b.mixed+', red 3s '+r.b.red3+(r.b.out?', went out':'');const edit=document.createElement('details');edit.className='round-edit';const sum=document.createElement('summary');sum.textContent='Edit this round';edit.appendChild(sum);const form=document.createElement('div');form.className='rules-content';[r.a,r.b].forEach((t,ti)=>{const team=document.createElement('div');team.className='edit-team';const h=document.createElement('h4');h.textContent=state.names[ti];team.appendChild(h);const grid=document.createElement('div');grid.className='edit-fields';createEditField(grid,'Extra meld points',t.meldExtra??Math.max(0,t.meld-countPoints(t.meldCards)),v=>{t.meldExtra=v;recalcRound(r)});createEditField(grid,'Extra hand points',t.handExtra??Math.max(0,t.hand-countPoints(t.handCards)),v=>{t.handExtra=v;recalcRound(r)});createEditField(grid,'Natural canastas',t.natural,v=>{t.natural=v;recalcRound(r)});createEditField(grid,'Mixed canastas',t.mixed,v=>{t.mixed=v;recalcRound(r)});createEditField(grid,'Red 3s (0–4)',t.red3,v=>{t.red3=Math.min(4,v);recalcRound(r)},'number');team.appendChild(grid);const outLabel=document.createElement('label'),out=document.createElement('input');out.type='checkbox';out.checked=!!t.out;outLabel.style.cssText='display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:700';outLabel.append(out,document.createTextNode('Went out (+100)'));out.onchange=()=>{t.out=out.checked;recalcRound(r)};team.appendChild(outLabel);const rankGrid=document.createElement('div');rankGrid.className='edit-fields';rankGrid.style.marginTop='10px';ranks.forEach(rank=>{createEditField(rankGrid,'Melded '+rank.label,(t.meldCards||{})[rank.key]||0,v=>{t.meldCards=t.meldCards||{};t.meldCards[rank.key]=v;recalcRound(r)});createEditField(rankGrid,'Left '+rank.label,(t.handCards||{})[rank.key]||0,v=>{t.handCards=t.handCards||{};t.handCards[rank.key]=v;recalcRound(r)})});team.appendChild(rankGrid);form.appendChild(team)});const deltaGrid=document.createElement('div');deltaGrid.className='edit-team';const dh=document.createElement('h4');dh.textContent='Manual round score override';deltaGrid.appendChild(dh);const dg=document.createElement('div');dg.className='edit-fields';createEditField(dg,state.names[0]+' round score',r.aDelta,v=>{r.aDelta=v;renderHistoryAndScores()});createEditField(dg,state.names[1]+' round score',r.bDelta,v=>{r.bDelta=v;renderHistoryAndScores()});deltaGrid.appendChild(dg);const note=document.createElement('p');note.className='hint';note.textContent='Editing a component recalculates that team’s round score. Use the manual score fields if you need to correct the final total directly.';form.append(deltaGrid,note);edit.appendChild(form);item.append(top,deltas,starter,breakdown,edit);list.appendChild(item)});}
+function recalcRound(r){['a','b'].forEach(k=>{const t=r[k];t.meld=(Number(t.meldExtra)||0)+countPoints(t.meldCards);t.hand=(Number(t.handExtra)||0)+countPoints(t.handCards);r[k+'Delta']=delta(t)});renderHistoryAndScores()}
+function renderHistoryAndScores(){save();renderScoreboard();renderHistory()}
+function render(){renderScoreboard();renderLive();renderHistory()}
+function newGame(){
+  if(!confirm('Start a new game? The current game and all its rounds will be saved under Past games.'))return;
+  if(state.rounds.length){state.pastGames=state.pastGames||[];state.pastGames.push({savedAt:new Date().toISOString(),names:[...state.names],players:[...state.players],gameStarter:state.gameStarter,rounds:JSON.parse(JSON.stringify(state.rounds))});}
+  state.rounds=[];state.gameStarter='';state.roundStarter='';
+  $('gameStarter').value='';$('roundStarter').value='';clearInputs();rebuildStarterOptions();save();render();status('New game started. Previous game is saved in Past games.');window.scrollTo({top:0,behavior:'smooth'});
+}
+function showPastGames(){
+  const games=state.pastGames||[];
+  if(!games.length){status('No past games saved yet.',true);return;}
+  const lines=games.map((g,i)=>`${i+1}. ${(g.names||['Team A','Team B']).join(' vs ')} — ${g.rounds?.length||0} rounds — ${new Date(g.savedAt).toLocaleString()}`);
+  const choice=prompt('PAST GAMES\n\n'+lines.join('\n')+'\n\nEnter a game number to restore it, or Cancel to keep playing. Restoring saves the current game first.');
+  if(choice===null||choice.trim()==='')return;
+  const idx=Number(choice)-1;if(!Number.isInteger(idx)||idx<0||idx>=games.length){status('That game number is not valid.',true);return;}
+  if(!confirm('Restore this past game? Your current game will be saved to Past games first.'))return;
+  if(state.rounds.length)state.pastGames.push({savedAt:new Date().toISOString(),names:[...state.names],players:[...state.players],gameStarter:state.gameStarter,rounds:JSON.parse(JSON.stringify(state.rounds))});
+  const g=state.pastGames.splice(idx,1)[0];state.names=[...(g.names||['Team A','Team B'])];state.players=[...(g.players||['','','',''])];state.gameStarter=g.gameStarter||'';state.rounds=JSON.parse(JSON.stringify(g.rounds||[]));state.roundStarter='';
+  $('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');$('gameStarter').value=state.gameStarter;$('roundStarter').value='';updateNames();rebuildStarterOptions();updateScoreLabels();clearInputs();save();render();status('Past game restored.');window.scrollTo({top:0,behavior:'smooth'});
+}
+function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const x=JSON.parse(raw);if(Array.isArray(x.rounds)&&Array.isArray(x.names)){state={...state,...x};state.names=[x.names[0]||'Team A',x.names[1]||'Team B'];state.players=Array.isArray(x.players)?x.players:['','','',''];state.pastGames=Array.isArray(x.pastGames)?x.pastGames:[];state.rounds=state.rounds.filter(r=>r&&r.a&&r.b&&Number.isFinite(Number(r.aDelta))&&Number.isFinite(Number(r.bDelta)));state.rounds.forEach(r=>['a','b'].forEach(k=>{const t=r[k];t.meldCards=t.meldCards||{};t.handCards=t.handCards||{};t.meldExtra=t.meldExtra??Math.max(0,(t.meld||0)-countPoints(t.meldCards));t.handExtra=t.handExtra??Math.max(0,(t.hand||0)-countPoints(t.handCards))}))}}}catch(e){storageWorks=false} $('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');$('gameStarter').value=state.gameStarter||'';$('roundStarter').value=state.roundStarter||'';updateNames();rebuildStarterOptions();updateScoreLabels();}
+// Create plus/minus controls and collapsible card-count sections.
+buildCardCounters('a');buildCardCounters('b');['aNatural','aMixed','aRed3','bNatural','bMixed','bRed3'].forEach(id=>buildStepper(id,id.endsWith('Red3')?4:999));
+ids.forEach(id=>$(id).addEventListener('input',()=>{if(id.endsWith('Red3')&&num(id)>4)$(id).value=4;renderLive()}));
+$('nameA').addEventListener('input',()=>{updateNames();rebuildStarterOptions();render()});$('nameB').addEventListener('input',()=>{updateNames();rebuildStarterOptions();render()});
+playerIds.forEach(id=>$(id).addEventListener('input',()=>{state.players=players();rebuildStarterOptions();updatePlayers();updateScoreLabels()}));$('gameStarter').addEventListener('change',()=>{state.gameStarter=$('gameStarter').value;if(!$('roundStarter').value)$('roundStarter').value=state.gameStarter;updatePlayers()});$('roundStarter').addEventListener('change',updatePlayers);
+$('scoreForm').addEventListener('submit',e=>{e.preventDefault();const a=getTeam('a'),b=getTeam('b');if(a.out&&canastas(0,a)<1){status(state.names[0]+' needs at least one canasta to go out.',true);return}if(b.out&&canastas(1,b)<1){status(state.names[1]+' needs at least one canasta to go out.',true);return}const starterVal=$('roundStarter').value;const starterName=starterVal===''?'Not recorded':(players()[Number(starterVal)]||'Not recorded');const round={time:new Date().toISOString(),starter:starterVal,starterName,a,b,aDelta:delta(a),bDelta:delta(b)};state.rounds.push(round);const count=activePlayers().length;if(count===2){state.roundStarter=nextStarterAfter(starterVal,state.rounds.length)}else if(state.rounds.length===1){state.roundStarter=''}else{state.roundStarter=nextStarterAfter(starterVal,state.rounds.length)};rebuildStarterOptions();$('roundStarter').value=state.roundStarter;save();clearInputs();render();status(storageWorks?'Round saved.':'Storage unavailable; export a backup.',!storageWorks);window.scrollTo({top:0,behavior:'smooth'})});
+$('resetFields').onclick=clearInputs;$('clearRound').onclick=clearInputs;$('newGame').onclick=newGame;$('pastGames').onclick=showPastGames;$('focusEntry').onclick=()=>$('entryPanel').scrollIntoView({behavior:'smooth'});$('focusHistory').onclick=()=>$('historyPanel').scrollIntoView({behavior:'smooth'});$('undoLast').onclick=()=>{if(!state.rounds.length)return status('There are no rounds to undo.',true);if(confirm('Undo the most recent round?')){state.rounds.pop();save();render();status('Last round undone.')}};
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({app:'Canasta Scorekeeper',version:2,...state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='canasta-score-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);status('Backup exported.')};$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.rounds)||!Array.isArray(x.names)||x.names.length!==2)throw Error('Invalid Canasta backup');if(!confirm('Restore backup and replace current scores?'))return;state={...state,...x};state.names=[x.names[0]||'Team A',x.names[1]||'Team B'];state.players=x.players||['','','',''];state.rounds.forEach(r=>['a','b'].forEach(k=>{r[k].meldCards=r[k].meldCards||{};r[k].handCards=r[k].handCards||{};r[k].meldExtra=r[k].meldExtra??Math.max(0,r[k].meld-countPoints(r[k].meldCards));r[k].handExtra=r[k].handExtra??Math.max(0,r[k].hand-countPoints(r[k].handCards))}));$('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');updateNames();rebuildStarterOptions();$('gameStarter').value=state.gameStarter||'';$('roundStarter').value=state.roundStarter||'';updateScoreLabels();save();clearInputs();render();status('Backup restored.')}catch(err){status(err.message||'Could not restore backup.',true)}finally{e.target.value=''}};
+load();render();if(!storageWorks)status('Browser storage unavailable. Export a backup.',true);
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('../../sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
