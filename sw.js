@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scorepad-static-v2';
+const CACHE_NAME = 'scorepad-static-v5';
 const APP_SHELL = [
   './',
   './index.html',

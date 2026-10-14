@@ -9,125 +9,533 @@
   :root {
     --bg: #174e4f;
     --bg-dark: #103b3c;
-    --ink: #252d2b;
-    --muted: #687572;
-    --line: #e1e8e4;
+    --ink: #202d2a;
+    --muted: #4f5e58;
+    --line: #dce5e0;
     --white: #fffefa;
-    --orange: #a34f70;
-    --orange-soft: #f8eaf0;
-    --blue: #b27a2d;
-    --blue-soft: #fbf1df;
+    --orange: #8f3d5f;
+    --orange-soft: #fbf0f4;
+    --blue: #7c4e0e;
+    --blue-soft: #fbf5eb;
     --green: #237653;
     --red: #a63838;
-    --shadow: 0 7px 18px rgba(19, 54, 48, .12);
+    --gold: #e6b75a;
+    --shadow: 0 7px 18px rgba(19, 54, 48, .10);
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
-    margin: 0; color: var(--ink); background: #e9f0eb;
+    margin: 0; color: var(--ink); background: #edf2ed;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    padding: max(14px, env(safe-area-inset-top)) 13px max(25px, env(safe-area-inset-bottom));
+    min-height: 100vh;
+    padding: 0 0 calc(98px + env(safe-area-inset-bottom));
   }
-  button, input { font: inherit; }
+  button, input, select { font: inherit; }
   button { -webkit-tap-highlight-color: transparent; }
-  .app { max-width: 900px; margin: 0 auto; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 2px 18px; color: white; }
-  .brand { font-size: clamp(1.6rem, 6vw, 2.35rem); font-weight: 850; letter-spacing: -.045em; line-height: 1.05; }
-  .offline-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.28); border-radius: 30px; background: rgba(255,255,255,.12); font-size: .72rem; font-weight: 750; white-space: nowrap; }
-  .dot { width: 7px; height: 7px; background: #8ff0b8; border-radius: 50%; display: inline-block; }
-  .panel { background: var(--white); border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
-  .scoreboard { padding: 16px; }
-  .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .team-score { min-width: 0; padding: 15px 14px 13px; border-radius: 22px; color: white; text-align: center; }
-  .team-score.a { background: #a34f70; }
-  .team-score.b { background: #b27a2d; }
-  .team-name { width: 100%; min-width: 0; border: 0; background: transparent; color: white; font-weight: 800; text-align: center; font-size: 1rem; padding: 2px 0 4px; overflow-wrap:anywhere; }
-  .team-name-fields input[type="text"], #playersPanel input[type="text"] { width:100%; min-width:0; padding:11px 10px; border:1px solid #dfe2eb; background:#fbfcff; border-radius:11px; font:inherit; color:var(--ink); }
+
+  /* Floating Live Score Summary */
+  .floating-score-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(16, 59, 60, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 -4px 22px rgba(10, 35, 36, 0.28);
+    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
+    pointer-events: auto;
+    user-select: none;
+  }
+  .floating-score-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+  }
+  .float-divider {
+    width: 1px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .float-team {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1px 4px;
+  }
+  .float-team-name {
+    font-size: clamp(.74rem, 2.2vw, .84rem);
+    font-weight: 850;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .float-team.a .float-team-name {
+    color: #f7bbd2;
+  }
+  .float-team.b .float-team-name {
+    color: #fce1a9;
+  }
+  .float-team-round {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1.1;
+    margin: 2px 0 1px;
+  }
+  .float-round-val {
+    font-size: clamp(1.2rem, 4.4vw, 1.55rem);
+    font-weight: 900;
+    letter-spacing: -.03em;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+  .float-round-tag {
+    font-size: .62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .float-team-total {
+    font-size: clamp(.72rem, 2vw, .82rem);
+    color: rgba(255, 255, 255, 0.82);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.2;
+  }
+  .float-team-total strong {
+    color: #fff;
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+  }
   
-  .total { font-weight: 850; font-size: clamp(2.3rem, 9vw, 3.2rem); line-height: 1.13; letter-spacing: -.04em; margin: 1px 0 8px; overflow-wrap: anywhere; }
-  .progress-track { height: 8px; background: rgba(255,255,255,.45); border-radius: 20px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: inherit; background: rgba(255,255,255,.95); width: 0%; transition: width .2s ease; }
-  .progress-line { display: flex; justify-content: space-between; gap: 8px; color: rgba(255,255,255,.95); font-size: .75rem; font-weight: 700; padding-top: 7px; }
+  /* Full-width accessible dark teal header */
+  .app-header {
+    width: 100%;
+    background: var(--bg);
+    color: #fff;
+    padding: max(12px, env(safe-area-inset-top)) 16px 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(16, 59, 60, .14);
+  }
+  .app-header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .home-btn {
+    color: #fff;
+    text-decoration: none;
+    font-size: .88rem;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 11px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, .10);
+    transition: background .15s ease;
+  }
+  .home-btn:hover { background: rgba(255, 255, 255, .20); }
+  .brand {
+    margin: 0;
+    font-size: clamp(1.4rem, 5vw, 1.95rem);
+    font-weight: 850;
+    letter-spacing: -.04em;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .offline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 255, 255, .30);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, .12);
+    font-size: .72rem;
+    font-weight: 750;
+    white-space: nowrap;
+    color: #fff;
+  }
+  .dot { width: 7px; height: 7px; background: #8ff0b8; border-radius: 50%; display: inline-block; }
+
+  .app { max-width: 900px; margin: 0 auto; padding: 0 6px; }
+  @media (max-width: 360px) { .app { padding: 0 4px; } }
+  @media (min-width: 480px) { .app { padding: 0 10px; } }
+  @media (min-width: 640px) { .app { padding: 0 16px; } }
+
+  .panel { background: var(--white); border-radius: 20px; padding: 16px; margin: 0 0 14px; box-shadow: var(--shadow); }
+  @media (max-width: 480px) { .panel { border-radius: 14px; padding: 12px 10px; margin-bottom: 12px; } }
+  @media (min-width: 640px) { .panel { padding: 22px; } }
+
+  /* Entry panel: unboxed edge-to-edge layout with no rounded outer card */
+  #entryPanel.panel, #entryPanel {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    margin: 0 0 14px;
+    border: 0;
+  }
+
+  .scoreboard { padding: 16px; }
+  @media (max-width: 480px) { .scoreboard { padding: 12px 10px; } }
+  .teams { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .team-score { min-width: 0; padding: 14px 10px 12px; border-radius: 16px; color: white; text-align: center; }
+  .team-score.a { background: #8f3d5f; }
+  .team-score.b { background: #7c4e0e; }
+  .team-name { width: 100%; min-width: 0; border: 0; background: transparent; color: white; font-weight: 800; text-align: center; font-size: 1rem; padding: 2px 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .team-name-fields input[type="text"], #playersPanel input[type="text"] { width: 100%; min-width: 0; padding: 10px 9px; border: 1px solid #dfe2eb; background: #fbfcff; border-radius: 9px; font: inherit; color: var(--ink); }
+  
+  .total { font-weight: 850; font-size: clamp(2.1rem, 8vw, 3.2rem); line-height: 1.12; letter-spacing: -.04em; margin: 1px 0 8px; overflow-wrap: anywhere; }
+  .progress-track { height: 8px; background: rgba(255, 255, 255, .42); border-radius: 20px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: inherit; background: rgba(255, 255, 255, .95); width: 0%; transition: width .2s ease; }
+  .progress-line { display: flex; justify-content: space-between; gap: 8px; color: rgba(255, 255, 255, .95); font-size: .75rem; font-weight: 700; padding-top: 7px; }
   .score-goal { text-align: center; color: var(--muted); font-size: .92rem; font-weight: 800; margin: 15px 0 12px; }
-  .action-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-  .action-row .action { min-width: 0; font-size: .82rem; }
-  .action.new-game { background: #f4e5d1; color: #6d4b22; box-shadow: none; }
-  .action.archives { background: #dcebe5; color: #174e4f; box-shadow: none; }
-  .action { border: 0; border-radius: 15px; background: var(--bg); color: white; min-height: 63px; padding: 10px 5px; cursor: pointer; font-weight: 800; box-shadow: 0 3px 0 rgba(30,45,120,.13); }
-  .action .emoji { display: block; font-size: 1.35rem; line-height: 1.1; margin-bottom: 4px; }
+  .action-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 480px) { .action-row { grid-template-columns: repeat(2, 1fr); } }
+  .action { border: 0; border-radius: 12px; background: var(--bg); color: white; min-height: 54px; padding: 8px 4px; cursor: pointer; font-weight: 800; font-size: .82rem; box-shadow: 0 3px 0 rgba(30, 45, 120, .13); }
+  .action .emoji { display: block; font-size: 1.25rem; line-height: 1.1; margin-bottom: 3px; }
   .action.secondary { background: #eef0ff; color: #4053ad; box-shadow: none; }
   .action.danger { background: #fff0ef; color: var(--red); box-shadow: none; }
-  .status { display: none; margin-top: 13px; padding: 12px 14px; border-radius: 13px; background: #eaf8ef; color: #17663f; font-weight: 750; }
+  .action.new-game { background: #fdf0db; color: #734e12; box-shadow: none; }
+  .action.archives { background: #dcebe5; color: #174e4f; box-shadow: none; }
+  .status { display: none; margin-top: 13px; padding: 12px 14px; border-radius: 12px; background: #eaf8ef; color: #17663f; font-weight: 750; }
   .status.show { display: block; }
   .status.warn { background: #fff3d9; color: #7a5100; }
-  .section-title { display: flex; align-items: center; gap: 10px; font-size: 1.22rem; font-weight: 850; color: var(--bg); margin: 0 0 15px; letter-spacing: -.02em; }
-  .section-title .icon { font-size: 1.5rem; line-height: 1; }
-  .divider { height: 1px; background: var(--line); margin: 0 0 15px; }
-  .meld-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .meld-box { background: #f7f8ff; border: 1px solid #ebedfa; border-radius: 15px; padding: 13px 14px; }
-  .meld-box .team-label { font-weight: 850; color: var(--bg); }
-  .meld-value { font-weight: 850; font-size: 1.65rem; padding-top: 3px; }
-  .hint { color: var(--muted); font-size: .82rem; line-height: 1.45; }
+  
+  .section-title { display: flex; align-items: center; gap: 10px; font-size: 1.22rem; font-weight: 850; color: var(--bg); margin: 0 0 12px; letter-spacing: -.02em; }
+  .section-title .icon { font-size: 1.45rem; line-height: 1; }
+  .divider { height: 1px; background: var(--line); margin: 0 0 14px; }
+  .meld-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .meld-box { background: #f7f8fa; border: 1px solid #ebedfa; border-radius: 12px; padding: 10px 12px; }
+  .meld-box .team-label { font-weight: 850; color: var(--bg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meld-value { font-weight: 850; font-size: 1.45rem; padding-top: 2px; color: var(--ink); }
+  .hint { color: var(--muted); font-size: .82rem; line-height: 1.4; }
   .entry-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-  .entry-heading .section-title { margin-bottom: 0; }
-  .small-btn { border: 0; border-radius: 10px; background: #eef0ff; color: #4053ad; padding: 8px 11px; font-weight: 800; font-size: .83rem; cursor: pointer; }
-  .team-entry { border: 1px solid var(--line); border-radius: 18px; padding: 15px; margin-top: 13px; }
-  .team-entry.a { border-top: 5px solid #a34f70; }
-  .team-entry.b { border-top: 5px solid #b27a2d; }
-  .entry-team-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 1.08rem; font-weight: 850; margin-bottom: 13px; }
-  .entry-team-title .tag { font-size: .72rem; padding: 5px 8px; background: #f3f4f8; color: var(--muted); border-radius: 8px; font-weight: 750; }
-  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+  .small-btn { border: 0; border-radius: 9px; background: #eef0ff; color: #4053ad; padding: 7px 11px; font-weight: 800; font-size: .82rem; cursor: pointer; }
+  .field-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 9px; }
+  @media (max-width: 480px) { .field-grid { grid-template-columns: minmax(0, 1fr); } }
   .field { min-width: 0; }
-  .field label { display: block; font-size: .81rem; font-weight: 750; color: #565968; margin-bottom: 6px; line-height: 1.25; }
-  .field input[type="number"] { width: 100%; min-width: 0; padding: 12px 10px; border: 1px solid #dfe2eb; background: #fbfcff; border-radius: 11px; font-size: 1.05rem; font-weight: 750; color: var(--ink); outline-color: var(--bg); }
-  .field input[type="number"]::-webkit-inner-spin-button { opacity: .5; }
-  .card-count-section { margin-top: 13px; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; }
-  .card-count-title { margin: 0; padding: 10px 12px; background: #a34f70; color: white; font-size: .96rem; font-weight: 850; }
-  .card-count-section.hand .card-count-title { background: #b27a2d; }
-  .stepper { display:grid; grid-template-columns: 38px 1fr 38px; align-items:center; gap:6px; }
-  .stepper-value { text-align:center; font-weight:800; font-size:1.05rem; font-variant-numeric:tabular-nums; }
-  .stepper-btn { border:0; border-radius:10px; background:#f0f1f5; min-height:38px; font-size:1.2rem; font-weight:800; cursor:pointer; }
-  .card-count-section > .card-count-title { cursor:pointer; list-style:none; }
-  .card-count-section > .card-count-title:after { content:'＋'; float:right; }
-  .card-count-section.expanded > .card-count-title:after { content:'−'; }
-  .count-body { display:none; }
-  .card-count-section.expanded .count-body { display:block; }
-  .round-edit { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
-  .round-edit summary { font-size:.92rem; }
-  .edit-team { border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:10px; }
-  .edit-team h4 { margin:0 0 8px; }
-  .edit-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .edit-fields label { font-size:.76rem; font-weight:700; display:block; margin-bottom:4px; }
-  .edit-fields input { width:100%; min-width:0; padding:8px; border:1px solid #dfe2eb; border-radius:8px; }
-  .round-edit-actions { display:flex; gap:8px; margin-top:10px; }
-  .count-row { display: grid; grid-template-columns: minmax(78px, 1fr) 40px 28px 40px; align-items: center; gap: 6px; padding: 7px 9px; border-bottom: 1px solid var(--line); }
-  .count-row:last-child { border-bottom: 0; }
-  .count-label { font-size: .84rem; font-weight: 750; }
-  .count-value { text-align: center; font-variant-numeric: tabular-nums; }
-  .count-btn { border: 0; border-radius: 10px; background: #f0f1f5; min-height: 38px; font-size: 1.2rem; font-weight: 800; cursor: pointer; }
-  .count-total { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px; background: #f7f8ff; font-size: .86rem; font-weight: 850; }
-  .bonus-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 11px; }
-  .bonus-grid .field input[type="number"] { padding: 10px 8px; }
-  .check-row { display: flex; align-items: center; gap: 10px; margin-top: 13px; padding: 11px 12px; border-radius: 11px; background: #f7f8fc; font-weight: 750; font-size: .9rem; cursor: pointer; }
-  .check-row input { width: 21px; height: 21px; accent-color: var(--bg); flex-shrink: 0; }
-  .live-score { display: flex; justify-content: space-between; gap: 10px; align-items: center; background: #f4f5ff; border-radius: 12px; padding: 11px 13px; margin-top: 12px; }
-  .live-score span:first-child { color: #626579; font-size: .85rem; font-weight: 750; }
-  .live-score strong { color: var(--bg); font-size: 1.25rem; }
-  .save-row { display: grid; grid-template-columns: 1fr auto; gap: 9px; margin-top: 15px; }
-  .save-btn { border: 0; border-radius: 13px; background: var(--bg); color: white; padding: 15px 12px; font-weight: 850; cursor: pointer; min-height: 52px; }
-  .clear-btn { border: 0; border-radius: 13px; background: #f1f2f6; color: #55596a; padding: 15px 14px; font-weight: 800; cursor: pointer; }
-  .history-item { border: 1px solid var(--line); border-radius: 15px; padding: 13px; margin-top: 10px; }
+  .field label { display: block; font-size: .8rem; font-weight: 750; color: #4e5552; margin-bottom: 5px; line-height: 1.25; }
+
+  /* -------------------------------------------------------------
+     Streamlined Side-by-Side Scoring with Zero Unwanted Outer Boxes
+     ------------------------------------------------------------- */
+  .team-header-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+    margin: 8px 0 4px;
+  }
+  @media (max-width: 360px) { .team-header-grid { gap: 4px; } }
+  .team-header-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 3px 2px 4px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    font-weight: 850;
+    font-size: clamp(.84rem, 2.5vw, .95rem);
+    min-width: 0;
+  }
+  .team-header-cell.a {
+    color: #8f3d5f;
+    border-bottom: 2px solid #8f3d5f;
+  }
+  .team-header-cell.b {
+    color: #7c4e0e;
+    border-bottom: 2px solid #7c4e0e;
+  }
+  .team-header-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .team-header-cell .tag {
+    flex-shrink: 0;
+    font-size: .62rem;
+    padding: 1px 4px;
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font-weight: 800;
+    letter-spacing: .02em;
+    opacity: .85;
+  }
+
+  /* Shared Sections: Flat unboxed containers with compact heading strip */
+  .shared-section {
+    margin-top: 8px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .shared-section-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 9px;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 850;
+    font-size: clamp(.82rem, 2.4vw, .94rem);
+    color: #fff;
+    text-align: left;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bonus-header { background: #8f3d5f; }
+  .meld-header { background: #174e4f; }
+  .hand-header { background: #7c4e0e; }
+  .shared-section-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -2px;
+  }
+  .toggle-glyph {
+    font-size: 1.15rem;
+    line-height: 1;
+    font-weight: 900;
+  }
+  .shared-section-body {
+    padding: 3px 0 6px;
+  }
+  .shared-section:not(.expanded) .shared-section-body {
+    display: none;
+  }
+  .shared-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+  }
+  @media (max-width: 360px) { .shared-cols { gap: 4px; } }
+  .team-col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  /* Compact Counter and Bonus Rows: Label on left, stepper buttons on right */
+  .count-row, .bonus-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 28px 20px 28px;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 0;
+    border-bottom: 1px solid #e2e8e4;
+    background: transparent;
+  }
+  @media (max-width: 360px) {
+    .count-row, .bonus-row {
+      grid-template-columns: minmax(0, 1fr) 26px 18px 26px;
+      gap: 2px;
+      padding: 3px 0;
+    }
+  }
+  .count-row:last-child {
+    border-bottom: 0;
+  }
+  .count-label, .bonus-label {
+    font-size: clamp(.68rem, 2vw, .78rem);
+    font-weight: 700;
+    color: var(--ink);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.2;
+    padding-right: 2px;
+  }
+  .count-btn {
+    border: 0;
+    border-radius: 6px;
+    background: #dfe5ec;
+    color: var(--ink);
+    min-height: 32px;
+    width: 28px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (max-width: 360px) {
+    .count-btn {
+      width: 26px;
+      min-height: 30px;
+      font-size: 1.05rem;
+    }
+  }
+  .count-btn:active {
+    background: #cbd3de;
+  }
+  .count-value {
+    text-align: center;
+    font-weight: 800;
+    font-size: clamp(.82rem, 2.2vw, .88rem);
+    font-variant-numeric: tabular-nums;
+    min-width: 0;
+  }
+  .stepper {
+    display: contents;
+  }
+
+  /* Unboxed Going Out Checkbox */
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    margin-top: 3px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: clamp(.68rem, 2vw, .78rem);
+    font-weight: 750;
+    color: var(--ink);
+    cursor: pointer;
+    user-select: none;
+    min-height: 32px;
+  }
+  .check-row input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--bg);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  /* Unboxed Extra Points Inputs */
+  .extra-field {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px dashed var(--line);
+    background: transparent;
+  }
+  .extra-field label {
+    display: block;
+    font-size: clamp(.66rem, 1.9vw, .74rem);
+    font-weight: 750;
+    color: var(--muted);
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+  .extra-field input[type="number"] {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 7px;
+    border: 1px solid #dfe2eb;
+    background: #fbfcff;
+    border-radius: 6px;
+    font-size: .88rem;
+    font-weight: 750;
+    color: var(--ink);
+  }
+  .subtotal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding: 5px 0 2px;
+    font-size: clamp(.66rem, 1.9vw, .76rem);
+    color: var(--muted);
+    font-weight: 750;
+    background: transparent;
+  }
+  .subtotal-row strong {
+    color: var(--ink);
+    font-size: clamp(.78rem, 2.2vw, .88rem);
+  }
+
+  /* Live round scores preview: compact without oversized containers */
+  .live-scores-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .live-score {
+    border-radius: 6px;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+  }
+  .live-score.a {
+    background: #fbf0f4;
+    border: 1px solid #f2d1de;
+  }
+  .live-score.b {
+    background: #fbf5eb;
+    border: 1px solid #fae5be;
+  }
+  .live-score-label {
+    font-size: clamp(.7rem, 2vw, .8rem);
+    font-weight: 800;
+    color: var(--ink);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .live-score strong {
+    font-size: clamp(1.05rem, 3.4vw, 1.35rem);
+    font-weight: 850;
+  }
+  .live-score.a strong { color: #8f3d5f; }
+  .live-score.b strong { color: #7c4e0e; }
+
+  .save-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 10px; }
+  .save-btn { border: 0; border-radius: 11px; background: var(--bg); color: white; padding: 12px 10px; font-weight: 850; cursor: pointer; min-height: 48px; font-size: .95rem; }
+  .clear-btn { border: 0; border-radius: 11px; background: #eaedf0; color: #434947; padding: 12px 14px; font-weight: 800; cursor: pointer; }
+
+  /* History list */
+  .history-item { border: 1px solid var(--line); border-radius: 15px; padding: 13px; margin-top: 10px; background: #fff; }
   .history-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .history-date { font-weight: 850; }
+  .history-date { font-weight: 850; font-size: 1.05rem; }
   .history-sub { color: var(--muted); font-size: .79rem; margin-top: 2px; }
-  .history-deltas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-  .delta { border-radius: 10px; padding: 9px 10px; font-weight: 850; font-size: .94rem; }
+  .history-deltas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 10px; }
+  .delta { border-radius: 10px; padding: 9px 10px; font-weight: 850; font-size: .94rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .delta.a { background: var(--orange-soft); color: #793650; }
   .delta.b { background: var(--blue-soft); color: #80551a; }
   .history-breakdown { color: var(--muted); font-size: .78rem; margin-top: 8px; line-height: 1.45; }
-  .delete-round { border: 0; border-radius: 9px; padding: 7px 9px; background: #fff0ef; color: var(--red); font-weight: 850; cursor: pointer; }
+  .delete-round { border: 0; border-radius: 9px; padding: 7px 10px; background: #fff0ef; color: var(--red); font-weight: 850; cursor: pointer; }
   .empty { color: var(--muted); text-align: center; padding: 20px 8px 8px; }
-  details { border-radius: 16px; }
+
+  /* Collapsible elements */
   details summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 850; color: var(--bg); font-size: 1.08rem; }
   details summary::-webkit-details-marker { display: none; }
   details summary:after { content: '+'; font-size: 1.5rem; line-height: 1; }
@@ -136,156 +544,38 @@
   .entry-collapse > summary:after { margin-left: auto; }
   .entry-collapse-content { padding-top: 4px; }
   .entry-collapse > summary .icon { flex: 0 0 auto; }
+
+  .round-edit { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .round-edit summary { font-size: .92rem; }
+  .edit-team { border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-top: 10px; background: #fafbfc; }
+  .edit-team h4 { margin: 0 0 8px; color: var(--bg); }
+  .edit-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .edit-fields label { font-size: .76rem; font-weight: 700; display: block; margin-bottom: 4px; color: var(--muted); }
+  .edit-fields input { width: 100%; min-width: 0; padding: 8px; border: 1px solid #dfe2eb; border-radius: 8px; background: #fff; }
+
   .rules-content { padding-top: 15px; }
   .rules-block { margin: 14px 0; }
-  .rules-block h3 { font-size: .95rem; margin: 0 0 7px; color: #5055a8; }
-  .rules-block ul { margin: 0; padding-left: 21px; color: #4c4e58; }
+  .rules-block h3 { font-size: .95rem; margin: 0 0 7px; color: var(--bg); font-weight: 800; }
+  .rules-block ul { margin: 0; padding-left: 21px; color: #434947; }
   .rules-block li { padding: 3px 0; line-height: 1.4; }
-  .backup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px; }
-  .backup-btn { border: 1px solid #dfe2ef; background: #f7f8ff; color: #4555a8; border-radius: 11px; min-height: 43px; padding: 10px; font-weight: 800; cursor: pointer; }
+  .backup-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 9px; margin-top: 13px; }
+  .backup-btn { border: 1px solid #dfe2ef; background: #f7f8fa; color: #354944; border-radius: 11px; min-height: 43px; padding: 10px; font-weight: 800; cursor: pointer; }
   #importFile { display: none; }
-  .footnote { color: rgba(255,255,255,.88); font-size: .77rem; text-align: center; line-height: 1.5; padding: 0 10px 8px; }
-  .hidden { display: none !important; }
-  @media (min-width: 680px) {
-    body { padding-left: 22px; padding-right: 22px; }
-    .scoreboard { padding: 22px; }
-    .team-entry-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .team-entry { margin-top: 13px; }
-    .panel { padding: 24px; }
-    .scoreboard { padding: 18px; }
-  }
-  /* Keep both teams visible side by side on phones, with compact controls. */
-  @media (max-width: 679px) {
-    .team-entry-wrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: start; }
-    .team-entry { min-width: 0; margin-top: 10px; padding: 9px; border-radius: 15px; }
-    .entry-team-title { align-items: flex-start; flex-wrap: wrap; gap: 5px; font-size: .88rem; margin-bottom: 10px; }
-    .entry-team-title .tag { font-size: .61rem; padding: 4px 5px; }
-    .card-count-title { padding: 9px 8px; font-size: .77rem; line-height: 1.25; }
-    .bonus-grid { grid-template-columns: minmax(0, 1fr); gap: 7px; }
-    .bonus-grid .field label { font-size: .74rem; }
-    .bonus-grid .field input[type="number"] { padding: 8px; font-size: .92rem; }
-    .field-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-    .field label { font-size: .74rem; }
-    .field input[type="number"] { padding: 9px 8px; font-size: .94rem; }
-    .check-row { align-items: flex-start; gap: 6px; padding: 9px 7px; font-size: .73rem; line-height: 1.3; }
-    .check-row input { width: 18px; height: 18px; }
-    .count-row { grid-template-columns: minmax(0, 1fr) 25px 18px 25px; gap: 3px; padding: 5px 4px; }
-    .count-label { min-width: 0; font-size: .68rem; overflow-wrap: anywhere; }
-    .count-btn { min-height: 32px; font-size: 1rem; border-radius: 8px; }
-    .count-value { font-size: .78rem; }
-    .count-total { flex-wrap: wrap; gap: 4px; padding: 8px 6px; font-size: .7rem; }
-    .live-score { padding: 9px 8px; gap: 4px; }
-    .live-score span:first-child { font-size: .74rem; }
-    .live-score strong { font-size: 1.05rem; }
-    .team-entry .card-count-section { margin-top: 9px; }
-  }
-  @media (max-width: 520px) { .action-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 360px) {
-    body { padding-left: 9px; padding-right: 9px; }
-    .panel { padding: 15px; border-radius: 20px; }
-    .team-score { padding-left: 8px; padding-right: 8px; }
-    .bonus-grid { gap: 6px; }
-    .bonus-grid .field label { font-size: .74rem; }
-    .team-entry { padding: 11px; }
-  }
-
-  /* Mobile refinement: one bonus control per row, with a compact +/- stepper. */
-  @media (max-width: 679px) {
-    .bonus-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%; }
-    .bonus-grid .field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(112px, 42%); align-items: center; gap: 8px; width: 100%; }
-    .bonus-grid .field label { margin: 0; font-size: .78rem; line-height: 1.2; overflow-wrap: normal; }
-    .bonus-grid .field .stepper { grid-template-columns: 30px minmax(18px, 1fr) 30px; gap: 4px; min-width: 0; }
-    .bonus-grid .field .stepper-btn { min-height: 34px; width: 30px; padding: 0; border-radius: 9px; }
-    .bonus-grid .field .stepper-value { font-size: .9rem; min-width: 0; }
-    .card-count-title { display: block; background: #a34f70; color: #fff; border-radius: 9px; padding: 9px 10px; margin: 7px 0 5px; line-height: 1.25; }
-    .card-count-section.hand .card-count-title { background: #b27a2d; color: #fff; }
-    .bonus-section .card-count-title { background: #a34f70; }
-  }
-
-  /* Final mobile cleanup: remove team/card containers and reclaim all available width. */
-  @media (max-width: 679px) {
-    body { padding-left: 0 !important; padding-right: 0 !important; }
-    .app { width: 100% !important; max-width: none !important; }
-    #entryPanel { padding-left: 12px !important; padding-right: 12px !important; }
-    .team-entry-wrap {
-      display: grid !important;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-      gap: 14px !important;
-      width: 100% !important;
-    }
-    .team-entry,
-    .team-entry.a,
-    .team-entry.b {
-      min-width: 0 !important;
-      width: 100% !important;
-      margin: 10px 0 0 !important;
-      padding: 0 !important;
-      border: 0 !important;
-      border-top: 0 !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .entry-team-title { margin-bottom: 10px !important; padding: 0 !important; }
-    .card-count-section,
-    .team-entry .card-count-section {
-      width: 100% !important;
-      margin: 12px 0 0 !important;
-      padding: 0 !important;
-      border: 0 !important;
-      border-radius: 0 !important;
-      overflow: visible !important;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    .card-count-title {
-      display: block !important;
-      width: 100% !important;
-      margin: 7px 0 6px !important;
-      padding: 8px 7px !important;
-      border: 0 !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      color: var(--bg) !important;
-      border-bottom: 2px solid currentColor !important;
-      line-height: 1.25 !important;
-      overflow-wrap: anywhere !important;
-    }
-    .card-count-section.hand .card-count-title { color: #936521 !important; background: transparent !important; }
-    .bonus-section .card-count-title { color: #a34f70 !important; background: transparent !important; }
-    .count-row {
-      display: grid !important;
-      grid-template-columns: minmax(0, 1fr) 28px minmax(14px, 20px) 28px !important;
-      gap: 3px !important;
-      width: 100% !important;
-      padding: 7px 0 !important;
-      border: 0 !important;
-      border-bottom: 0 !important;
-      background: transparent !important;
-    }
-    .count-label { min-width: 0 !important; overflow-wrap: anywhere !important; font-size: .7rem !important; }
-    .count-btn { width: 28px !important; min-width: 28px !important; min-height: 32px !important; padding: 0 !important; }
-    .count-value { text-align: center !important; min-width: 0 !important; }
-    .count-total { border: 0 !important; border-radius: 0 !important; background: transparent !important; padding: 8px 0 !important; }
-    .bonus-grid .field { grid-template-columns: minmax(0, 1fr) 96px !important; gap: 4px !important; }
-    .bonus-grid .field .stepper { grid-template-columns: 27px minmax(12px, 1fr) 27px !important; gap: 2px !important; }
-    .bonus-grid .field .stepper-btn { width: 27px !important; min-height: 31px !important; }
-    .check-row, .live-score { border: 0 !important; border-radius: 0 !important; box-shadow: none !important; padding-left: 0 !important; padding-right: 0 !important; background: transparent !important; }
-    .field-grid { grid-template-columns: minmax(0, 1fr) !important; }
-  }
-
+  .footnote { color: var(--muted); font-size: .8rem; text-align: center; line-height: 1.5; padding: 8px 10px 16px; margin: 0; }
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="topbar">
+<header class="app-header">
+  <div class="app-header-inner">
     <div style="display:flex;align-items:center;gap:12px;min-width:0">
-      <a href="../../index.html" aria-label="Back to Scorepad home" style="color:white;text-decoration:none;font-size:.9rem;font-weight:800;border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:9px 11px;white-space:nowrap">← Home</a>
-      <div class="brand">Canasta</div>
+      <a href="../../index.html" class="home-btn" aria-label="Back to Scorepad home">← Home</a>
+      <h1 class="brand">Canasta</h1>
     </div>
     <div class="offline-pill"><span class="dot"></span> OFFLINE · AUTO-SAVE</div>
-  </header>
+  </div>
+</header>
 
+<div class="app">
   <section class="panel" id="playersPanel">
     <details open>
       <summary>Players &amp; first turn</summary>
@@ -305,7 +595,6 @@
       </div>
     </details>
   </section>
-
 
   <section class="panel scoreboard" aria-label="Scoreboard">
     <div class="teams">
@@ -333,61 +622,179 @@
     <div class="status" id="status" role="status" aria-live="polite"></div>
   </section>
 
-
   <section class="panel">
     <h2 class="section-title"><span class="icon">↗</span> Minimum melding</h2>
     <div class="divider"></div>
     <div class="meld-grid">
-      <div class="meld-box"><div class="team-label" id="meldNameA">Team A</div><div class="meld-value" id="meldA">50 points</div><div class="hint" id="meldHintA">Current score under 1,500</div></div>
-      <div class="meld-box"><div class="team-label" id="meldNameB">Team S</div><div class="meld-value" id="meldB">50 points</div><div class="hint" id="meldHintB">Current score under 1,500</div></div>
+      <div class="meld-box"><div class="team-label" id="meldNameA">Team A</div><div class="meld-value" id="meldA">50 points</div><div class="hint" id="meldHintA">Current score: 0</div></div>
+      <div class="meld-box"><div class="team-label" id="meldNameB">Team B</div><div class="meld-value" id="meldB">50 points</div><div class="hint" id="meldHintB">Current score: 0</div></div>
     </div>
   </section>
 
   <section class="panel" id="entryPanel">
-    <details open class="entry-collapse">
+    <details open class="entry-collapse" id="entryDetails">
       <summary class="section-title"><span class="icon">＋</span> Enter round scores</summary>
       <div class="entry-collapse-content">
         <div class="entry-heading" style="justify-content:flex-end;margin-top:10px">
           <button class="small-btn" id="resetFields" type="button">Clear fields</button>
         </div>
-    <p class="hint" style="margin:8px 0 3px">Enter the card points and bonuses for each team. Round totals update automatically.</p>
-    <form id="scoreForm">
-      <div class="field" style="margin:12px 0"><label for="roundStarter">Who started this round?</label><select id="roundStarter" style="width:100%;padding:12px;border:1px solid #dfe2eb;border-radius:11px;background:#fbfcff;font:inherit"></select></div>
-      <div class="team-entry-wrap">
-        <div class="team-entry a">
-          <div class="entry-team-title"><span id="entryNameA">Team A</span><span class="tag">TEAM 1</span></div>
-          <div class="field-grid">
-            <div class="field"><label for="aMeld">Extra meld points (optional)</label><input id="aMeld" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
-            <div class="field"><label for="aHand">Extra hand points to subtract (optional)</label><input id="aHand" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+        <p class="hint" style="margin:8px 0 12px">Enter the card points and bonuses for each team. Round totals update automatically.</p>
+        <form id="scoreForm">
+          <div class="field" style="margin:0 0 14px">
+            <label for="roundStarter">Who started this round?</label>
+            <select id="roundStarter" style="width:100%;padding:12px;border:1px solid #dfe2eb;border-radius:11px;background:#fbfcff;font:inherit"></select>
           </div>
-          <div class="bonus-grid">
-            <div class="field"><label>Natural canastas</label><div class="stepper" id="aNaturalStepper" data-target="aNatural"></div><input id="aNatural" type="hidden" value="0"></div>
-            <div class="field"><label>Mixed canastas</label><div class="stepper" id="aMixedStepper" data-target="aMixed"></div><input id="aMixed" type="hidden" value="0"></div>
-            <div class="field"><label>Red 3s (0–4)</label><div class="stepper" id="aRed3Stepper" data-target="aRed3"></div><input id="aRed3" type="hidden" value="0"></div>
+
+          <!-- Persistent Team Labels Header Bar -->
+          <div class="team-header-grid">
+            <div class="team-header-cell a">
+              <span class="team-header-name" id="entryNameA">Team A</span>
+              <span class="tag">TEAM 1</span>
+            </div>
+            <div class="team-header-cell b">
+              <span class="team-header-name" id="entryNameB">Team B</span>
+              <span class="tag">TEAM 2</span>
+            </div>
           </div>
-          <label class="check-row"><input id="aOut" type="checkbox"> Went out this round (+100)</label>
-          <div class="live-score"><span>Round score</span><strong id="aRoundTotal">0</strong></div>
-        </div>
-        <div class="team-entry b">
-          <div class="entry-team-title"><span id="entryNameB">Team S</span><span class="tag">TEAM 2</span></div>
-          <div class="field-grid">
-            <div class="field"><label for="bMeld">Extra meld points (optional)</label><input id="bMeld" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
-            <div class="field"><label for="bHand">Extra hand points to subtract (optional)</label><input id="bHand" type="number" inputmode="numeric" min="0" step="5" value="0"></div>
+
+          <!-- Section 1: Canasta bonuses & going out (Shared full-width banner) -->
+          <div class="shared-section bonus-section expanded" id="secBonus">
+            <button type="button" class="shared-section-header bonus-header" id="toggleBonus" aria-expanded="true">
+              <span>Canasta bonuses &amp; going out</span>
+              <span class="toggle-glyph" aria-hidden="true">−</span>
+            </button>
+            <div class="shared-section-body">
+              <div class="shared-cols">
+                <!-- Team A bonuses -->
+                <div class="team-col a">
+                  <div class="bonus-row">
+                    <span class="bonus-label">Natural canastas</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="aNatural" data-delta="-1" aria-label="Decrease Team A natural canastas">−</button>
+                      <span class="count-value" id="aNaturalVal">0</span>
+                      <button type="button" class="count-btn" data-step="aNatural" data-delta="1" aria-label="Increase Team A natural canastas">+</button>
+                    </div>
+                    <input id="aNatural" type="hidden" value="0">
+                  </div>
+                  <div class="bonus-row">
+                    <span class="bonus-label">Mixed canastas</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="aMixed" data-delta="-1" aria-label="Decrease Team A mixed canastas">−</button>
+                      <span class="count-value" id="aMixedVal">0</span>
+                      <button type="button" class="count-btn" data-step="aMixed" data-delta="1" aria-label="Increase Team A mixed canastas">+</button>
+                    </div>
+                    <input id="aMixed" type="hidden" value="0">
+                  </div>
+                  <div class="bonus-row">
+                    <span class="bonus-label">Red 3s (0–4)</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="aRed3" data-delta="-1" data-max="4" aria-label="Decrease Team A red 3s">−</button>
+                      <span class="count-value" id="aRed3Val">0</span>
+                      <button type="button" class="count-btn" data-step="aRed3" data-delta="1" data-max="4" aria-label="Increase Team A red 3s">+</button>
+                    </div>
+                    <input id="aRed3" type="hidden" value="0">
+                  </div>
+                  <label class="check-row" for="aOut">
+                    <input id="aOut" type="checkbox">
+                    <span>Went out this round (+100)</span>
+                  </label>
+                </div>
+
+                <!-- Team B bonuses -->
+                <div class="team-col b">
+                  <div class="bonus-row">
+                    <span class="bonus-label">Natural canastas</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="bNatural" data-delta="-1" aria-label="Decrease Team B natural canastas">−</button>
+                      <span class="count-value" id="bNaturalVal">0</span>
+                      <button type="button" class="count-btn" data-step="bNatural" data-delta="1" aria-label="Increase Team B natural canastas">+</button>
+                    </div>
+                    <input id="bNatural" type="hidden" value="0">
+                  </div>
+                  <div class="bonus-row">
+                    <span class="bonus-label">Mixed canastas</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="bMixed" data-delta="-1" aria-label="Decrease Team B mixed canastas">−</button>
+                      <span class="count-value" id="bMixedVal">0</span>
+                      <button type="button" class="count-btn" data-step="bMixed" data-delta="1" aria-label="Increase Team B mixed canastas">+</button>
+                    </div>
+                    <input id="bMixed" type="hidden" value="0">
+                  </div>
+                  <div class="bonus-row">
+                    <span class="bonus-label">Red 3s (0–4)</span>
+                    <div class="stepper">
+                      <button type="button" class="count-btn" data-step="bRed3" data-delta="-1" data-max="4" aria-label="Decrease Team B red 3s">−</button>
+                      <span class="count-value" id="bRed3Val">0</span>
+                      <button type="button" class="count-btn" data-step="bRed3" data-delta="1" data-max="4" aria-label="Increase Team B red 3s">+</button>
+                    </div>
+                    <input id="bRed3" type="hidden" value="0">
+                  </div>
+                  <label class="check-row" for="bOut">
+                    <input id="bOut" type="checkbox">
+                    <span>Went out this round (+100)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="bonus-grid">
-            <div class="field"><label>Natural canastas</label><div class="stepper" id="bNaturalStepper" data-target="bNatural"></div><input id="bNatural" type="hidden" value="0"></div>
-            <div class="field"><label>Mixed canastas</label><div class="stepper" id="bMixedStepper" data-target="bMixed"></div><input id="bMixed" type="hidden" value="0"></div>
-            <div class="field"><label>Red 3s (0–4)</label><div class="stepper" id="bRed3Stepper" data-target="bRed3"></div><input id="bRed3" type="hidden" value="0"></div>
+
+          <!-- Section 2: Melded hands · count cards (Shared full-width banner) -->
+          <div class="shared-section meld-section expanded" id="secMeld">
+            <button type="button" class="shared-section-header meld-header" id="toggleMeld" aria-expanded="true">
+              <span>Melded hands · count cards</span>
+              <span class="toggle-glyph" aria-hidden="true">−</span>
+            </button>
+            <div class="shared-section-body">
+              <div class="shared-cols">
+                <!-- Team A meld cards -->
+                <div class="team-col a" id="aMeldContainer">
+                  <!-- Populated by populateCardRows -->
+                </div>
+                <!-- Team B meld cards -->
+                <div class="team-col b" id="bMeldContainer">
+                  <!-- Populated by populateCardRows -->
+                </div>
+              </div>
+            </div>
           </div>
-          <label class="check-row"><input id="bOut" type="checkbox"> Went out this round (+100)</label>
-          <div class="live-score"><span>Round score</span><strong id="bRoundTotal">0</strong></div>
-        </div>
-      </div>
-      <div class="save-row">
-        <button class="save-btn" type="submit">Save round scores</button>
-        <button class="clear-btn" type="button" id="clearRound">Reset</button>
-      </div>
-    </form>
+
+          <!-- Section 3: Cards left · count cards (Shared full-width banner) -->
+          <div class="shared-section hand-section expanded" id="secHand">
+            <button type="button" class="shared-section-header hand-header" id="toggleHand" aria-expanded="true">
+              <span>Cards left · count cards</span>
+              <span class="toggle-glyph" aria-hidden="true">−</span>
+            </button>
+            <div class="shared-section-body">
+              <div class="shared-cols">
+                <!-- Team A cards left -->
+                <div class="team-col a" id="aHandContainer">
+                  <!-- Populated by populateCardRows -->
+                </div>
+                <!-- Team B cards left -->
+                <div class="team-col b" id="bHandContainer">
+                  <!-- Populated by populateCardRows -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live round scores preview -->
+          <div class="live-scores-grid">
+            <div class="live-score a">
+              <span class="live-score-label" id="liveScoreNameA">Team A round</span>
+              <strong id="aRoundTotal">0</strong>
+            </div>
+            <div class="live-score b">
+              <span class="live-score-label" id="liveScoreNameB">Team B round</span>
+              <strong id="bRoundTotal">0</strong>
+            </div>
+          </div>
+
+          <div class="save-row">
+            <button class="save-btn" type="submit">Save round scores</button>
+            <button class="clear-btn" type="button" id="clearRound">Reset</button>
+          </div>
+        </form>
       </div>
     </details>
   </section>
@@ -432,73 +839,887 @@
   </section>
   <p class="footnote">Runs offline · No account or internet required<br>For reliable auto-save, reopen this file in the same browser on the same device.</p>
 </div>
+
+<aside class="floating-score-bar" id="floatingScoreBar" aria-label="Live Score Summary">
+  <div class="floating-score-inner">
+    <div class="float-team a">
+      <div class="float-team-name" id="floatNameA">Team A</div>
+      <div class="float-team-round">
+        <span class="float-round-val" id="floatRoundA">+0</span>
+        <span class="float-round-tag">Round</span>
+      </div>
+      <div class="float-team-total">
+        <span class="float-total-lbl">Total:</span>
+        <strong id="floatTotalA">0</strong>
+      </div>
+    </div>
+
+    <div class="float-divider" aria-hidden="true"></div>
+
+    <div class="float-team b">
+      <div class="float-team-name" id="floatNameB">Team B</div>
+      <div class="float-team-round">
+        <span class="float-round-val" id="floatRoundB">+0</span>
+        <span class="float-round-tag">Round</span>
+      </div>
+      <div class="float-team-total">
+        <span class="float-total-lbl">Total:</span>
+        <strong id="floatTotalB">0</strong>
+      </div>
+    </div>
+  </div>
+</aside>
+
 <script>
 (() => {
 'use strict';
-const STORAGE_KEY='canasta-scorekeeper-v1'; const $=id=>document.getElementById(id);
-const num=id=>Math.max(0,parseInt($(id)?.value||'0',10)||0);
-const ids=['aMeld','aHand','aNatural','aMixed','aRed3','aOut','bMeld','bHand','bNatural','bMixed','bRed3','bOut'];
-const ranks=[{key:'J',label:'Jokers',points:50},{key:'2',label:'2s',points:20},{key:'A',label:'Aces',points:20},{key:'K8',label:'Kings–8s',points:10},{key:'74',label:'7s–4s',points:5},{key:'B3',label:'Black 3s',points:5}];
-const playerIds=['aPlayer1','aPlayer2','bPlayer1','bPlayer2'];
-let state={names:['Team A','Team B'],players:['','','',''],gameStarter:'',roundStarter:'',rounds:[],pastGames:[]}; let storageWorks=true;
-function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageWorks=true}catch(e){storageWorks=false}return storageWorks}
-function status(msg,warn=false){const n=$('status');n.textContent=msg;n.className='status show'+(warn?' warn':'');clearTimeout(status.timer);status.timer=setTimeout(()=>n.classList.remove('show'),4500)}
-function scoreFmt(n){return Math.round(Number(n)||0).toLocaleString('en-US')}
-function fmt(n){n=Math.round(Number(n)||0);return (n>0?'+':'')+n.toLocaleString('en-US')}
-function red3Points(n){return n===4?800:n*100}
-function getCounts(prefix,section){const o={};ranks.forEach(r=>o[r.key]=num(prefix+section+r.key));return o}
-function countPoints(counts){return ranks.reduce((s,r)=>s+(Number(counts?.[r.key])||0)*r.points,0)}
-function cardCountPoints(prefix,section){return countPoints(getCounts(prefix,section))}
-function getTeam(prefix){return {meldExtra:num(prefix+'Meld'),handExtra:num(prefix+'Hand'),meldCards:getCounts(prefix,'MeldCount'),handCards:getCounts(prefix,'HandCount'),meld:num(prefix+'Meld')+cardCountPoints(prefix,'MeldCount'),hand:num(prefix+'Hand')+cardCountPoints(prefix,'HandCount'),natural:num(prefix+'Natural'),mixed:num(prefix+'Mixed'),red3:Math.min(4,num(prefix+'Red3')),out:$(prefix+'Out').checked}}
-function delta(t){return t.meld-t.hand+t.natural*500+t.mixed*300+red3Points(t.red3)+(t.out?100:0)}
-function teamTotal(i){return state.rounds.reduce((s,r)=>s+Number(i===0?r.aDelta:r.bDelta),0)}
-function canastas(i,extra){return state.rounds.reduce((s,r)=>s+(i===0?r.a.natural+r.a.mixed:r.b.natural+r.b.mixed),0)+(extra?extra.natural+extra.mixed:0)}
-function minMeld(n){return n>=3000?120:n>=1500?90:50}
-function updateNames(){state.names=[ $('nameA').value.trim()||'Team A',$('nameB').value.trim()||'Team B'];$('meldNameA').textContent=state.names[0];$('meldNameB').textContent=state.names[1];$('entryNameA').textContent=state.names[0];$('entryNameB').textContent=state.names[1];updateScoreLabels();save()}
-function updateScoreLabels(){const ps=players();$('scoreLabelA').textContent=ps[0]||state.names[0];$('scoreLabelB').textContent=ps[2]||state.names[1];$('scoreLabelA').title=state.names[0];$('scoreLabelB').title=state.names[1]}
-function players(){return playerIds.map(id=>$(id).value.trim())}
-function rebuildStarterOptions(){const ps=players();const options=[];ps.forEach((name,i)=>{if(name)options.push({value:String(i),label:name+' ('+(i===0||i===1?state.names[0]:state.names[1])+')'})});const fill=(sel,selected,placeholder)=>{const old=selected??sel.value;sel.innerHTML='';const opt=document.createElement('option');opt.value='';opt.textContent=placeholder;sel.appendChild(opt);options.forEach(o=>{const x=document.createElement('option');x.value=o.value;x.textContent=o.label;sel.appendChild(x)});if([...sel.options].some(o=>o.value===String(old)))sel.value=String(old)};fill($('gameStarter'),state.gameStarter,'Select first player');const roundChoice=state.roundStarter!==''?state.roundStarter:(state.rounds.length===0?state.gameStarter:'');fill($('roundStarter'),roundChoice,'Select round starter');}
-function activePlayers(){return players().map((name,i)=>({name,index:i})).filter(p=>p.name)}
-function nextStarterAfter(savedStarter, roundCount){const ps=activePlayers();if(ps.length<2)return '';const current=Number(savedStarter);if(!Number.isInteger(current)||!ps.some(p=>p.index===current))return '';if(ps.length===2){return String(ps.find(p=>p.index!==current)?.index??'')}if(roundCount<2)return '';const pos=ps.findIndex(p=>p.index===current);return String(ps[(pos+1)%ps.length].index)}
-function updatePlayers(){state.players=players();state.gameStarter=$('gameStarter').value;state.roundStarter=$('roundStarter').value;save()}
-function renderScoreboard(){const a=teamTotal(0),b=teamTotal(1);$('scoreA').textContent=scoreFmt(a);$('scoreB').textContent=scoreFmt(b);['A','B'].forEach((x,i)=>{const v=i?b:a;$(('progress'+x)).style.width=Math.max(0,Math.min(100,v/50))+'%';$('pct'+x).textContent=Math.max(0,Math.round(v/50))+'%'});$('meldA').textContent=minMeld(a)+' points';$('meldB').textContent=minMeld(b)+' points';$('meldHintA').textContent='Current score: '+scoreFmt(a);$('meldHintB').textContent='Current score: '+scoreFmt(b);let msg='Progress to 5,000 points';if(a>=5000&&canastas(0)>0)msg='🏆 '+state.names[0]+' has reached 5,000 points!';else if(b>=5000&&canastas(1)>0)msg='🏆 '+state.names[1]+' has reached 5,000 points!';else if(a>=5000)msg=state.names[0]+' reached 5,000 but still needs a canasta to go out.';else if(b>=5000)msg=state.names[1]+' reached 5,000 but still needs a canasta to go out.';$('gameStatus').textContent=msg}
-function renderLive(){['a','b'].forEach(p=>{const t=getTeam(p);$(''+p+'RoundTotal').textContent=fmt(delta(t));const m=$(p+'MeldCountTotal'),h=$(p+'HandCountTotal');if(m)m.textContent=scoreFmt(t.meld)+' pts';if(h)h.textContent=scoreFmt(t.hand)+' pts'})}
-function buildStepper(id,max=999){const host=$(id+'Stepper');if(!host)return;host.innerHTML='';const minus=document.createElement('button');minus.type='button';minus.className='stepper-btn';minus.textContent='−';const value=document.createElement('span');value.className='stepper-value';value.textContent='0';const plus=document.createElement('button');plus.type='button';plus.className='stepper-btn';plus.textContent='+';const update=d=>{const v=Math.max(0,Math.min(max,num(id)+d));$(id).value=v;value.textContent=v;renderLive()};minus.onclick=()=>update(-1);plus.onclick=()=>update(1);host.append(minus,value,plus)}
-function buildCardCounters(prefix){const team=document.querySelector('.team-entry.'+(prefix==='a'?'a':'b'));const bonus=team.querySelector('.bonus-grid');const make=(section,title,cls)=>{const box=document.createElement('div');box.className='card-count-section '+cls+' expanded';const heading=document.createElement('h4');heading.className='card-count-title';heading.textContent=title;heading.tabIndex=0;heading.setAttribute('role','button');heading.setAttribute('aria-expanded','true');const body=document.createElement('div');body.className='count-body';const toggle=()=>{box.classList.toggle('expanded');heading.setAttribute('aria-expanded',box.classList.contains('expanded'))};heading.onclick=toggle;heading.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}};box.append(heading,body);ranks.forEach(r=>{const row=document.createElement('div');row.className='count-row';const label=document.createElement('span');label.className='count-label';label.textContent=r.label+' ('+r.points+' pts)';const minus=document.createElement('button');minus.type='button';minus.className='count-btn';minus.textContent='−';const val=document.createElement('span');val.className='count-value';val.id=prefix+section+r.key+'Value';val.textContent='0';const plus=document.createElement('button');plus.type='button';plus.className='count-btn';plus.textContent='+';const inp=document.createElement('input');inp.type='hidden';inp.id=prefix+section+r.key;inp.value='0';const change=d=>{inp.value=Math.max(0,num(inp.id)+d);val.textContent=inp.value;renderLive()};minus.onclick=()=>change(-1);plus.onclick=()=>change(1);row.append(label,minus,val,plus,inp);body.appendChild(row)});const total=document.createElement('div');total.className='count-total';total.innerHTML='<span>Calculated card points</span><strong id="'+prefix+section+'Total">0 pts</strong>';body.appendChild(total);return box};const meld=make('MeldCount','Melded hands · count cards','meld'),hand=make('HandCount','Cards left · count cards','hand');const bonusBox=document.createElement('div');bonusBox.className='card-count-section bonus-section expanded';const bonusTitle=document.createElement('h4');bonusTitle.className='card-count-title';bonusTitle.textContent='Canasta bonuses & going out';bonusTitle.tabIndex=0;bonusTitle.setAttribute('role','button');bonusTitle.setAttribute('aria-expanded','true');const bonusBody=document.createElement('div');bonusBody.className='count-body';const goingOut=team.querySelector('.check-row');bonusTitle.onclick=()=>{bonusBox.classList.toggle('expanded');bonusTitle.setAttribute('aria-expanded',bonusBox.classList.contains('expanded'))};bonusTitle.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();bonusTitle.click()}};bonusBody.append(bonus,goingOut);bonusBox.append(bonusTitle,bonusBody);const firstFields=team.querySelector('.field-grid');team.insertBefore(bonusBox,firstFields);team.insertBefore(meld,bonusBox.nextSibling);team.insertBefore(hand,meld.nextSibling)}
-function clearInputs(){ids.forEach(id=>{if(id.endsWith('Out'))$(id).checked=false;else $(id).value='0'});document.querySelectorAll('.card-count-section input[type=hidden]').forEach(n=>n.value='0');document.querySelectorAll('.count-value').forEach(n=>n.textContent='0');document.querySelectorAll('.card-count-section').forEach(n=>{n.classList.add('expanded');n.querySelector('.card-count-title')?.setAttribute('aria-expanded','true')});renderLive();save()}
-function createEditField(container,label,value,onchange,type='number'){const wrap=document.createElement('div'),lab=document.createElement('label'),input=document.createElement('input');lab.textContent=label;input.type=type;input.value=value??0;if(type==='number'){input.min='0';input.step='1'}input.addEventListener('change',()=>onchange(type==='number'?Math.max(0,Number(input.value)||0):input.value));wrap.append(lab,input);container.appendChild(wrap)}
-function renderHistory(){const list=$('historyList');$('roundCount').textContent=state.rounds.length+(state.rounds.length===1?' round':' rounds');list.innerHTML='';if(!state.rounds.length){list.innerHTML='<div class="empty">No rounds recorded yet. Add your first round above.</div>';return} [...state.rounds].reverse().forEach((r,rev)=>{const i=state.rounds.length-1-rev,item=document.createElement('div');item.className='history-item';const top=document.createElement('div');top.className='history-top';const left=document.createElement('div'),title=document.createElement('div'),date=document.createElement('div');title.className='history-date';title.textContent='Round '+(i+1);date.className='history-sub';const d=new Date(r.time);date.textContent=Number.isNaN(d.getTime())?'':d.toLocaleString([],{dateStyle:'medium',timeStyle:'short'});left.append(title,date);const del=document.createElement('button');del.className='delete-round';del.type='button';del.textContent='Delete';del.onclick=()=>{if(confirm('Delete round '+(i+1)+'?')){state.rounds.splice(i,1);save();render();status('Round deleted.')}};top.append(left,del);const deltas=document.createElement('div');deltas.className='history-deltas';const da=document.createElement('div'),db=document.createElement('div');da.className='delta a';db.className='delta b';da.textContent=state.names[0]+': '+fmt(r.aDelta);db.textContent=state.names[1]+': '+fmt(r.bDelta);deltas.append(da,db);const starter=document.createElement('div');starter.className='history-sub';starter.textContent='Started by: '+(r.starterName||'Not recorded');const breakdown=document.createElement('div');breakdown.className='history-breakdown';breakdown.textContent=state.names[0]+': meld '+scoreFmt(r.a.meld)+' − hand '+scoreFmt(r.a.hand)+', natural '+r.a.natural+', mixed '+r.a.mixed+', red 3s '+r.a.red3+(r.a.out?', went out':'')+' · '+state.names[1]+': meld '+scoreFmt(r.b.meld)+' − hand '+scoreFmt(r.b.hand)+', natural '+r.b.natural+', mixed '+r.b.mixed+', red 3s '+r.b.red3+(r.b.out?', went out':'');const edit=document.createElement('details');edit.className='round-edit';const sum=document.createElement('summary');sum.textContent='Edit this round';edit.appendChild(sum);const form=document.createElement('div');form.className='rules-content';[r.a,r.b].forEach((t,ti)=>{const team=document.createElement('div');team.className='edit-team';const h=document.createElement('h4');h.textContent=state.names[ti];team.appendChild(h);const grid=document.createElement('div');grid.className='edit-fields';createEditField(grid,'Extra meld points',t.meldExtra??Math.max(0,t.meld-countPoints(t.meldCards)),v=>{t.meldExtra=v;recalcRound(r)});createEditField(grid,'Extra hand points',t.handExtra??Math.max(0,t.hand-countPoints(t.handCards)),v=>{t.handExtra=v;recalcRound(r)});createEditField(grid,'Natural canastas',t.natural,v=>{t.natural=v;recalcRound(r)});createEditField(grid,'Mixed canastas',t.mixed,v=>{t.mixed=v;recalcRound(r)});createEditField(grid,'Red 3s (0–4)',t.red3,v=>{t.red3=Math.min(4,v);recalcRound(r)},'number');team.appendChild(grid);const outLabel=document.createElement('label'),out=document.createElement('input');out.type='checkbox';out.checked=!!t.out;outLabel.style.cssText='display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:700';outLabel.append(out,document.createTextNode('Went out (+100)'));out.onchange=()=>{t.out=out.checked;recalcRound(r)};team.appendChild(outLabel);const rankGrid=document.createElement('div');rankGrid.className='edit-fields';rankGrid.style.marginTop='10px';ranks.forEach(rank=>{createEditField(rankGrid,'Melded '+rank.label,(t.meldCards||{})[rank.key]||0,v=>{t.meldCards=t.meldCards||{};t.meldCards[rank.key]=v;recalcRound(r)});createEditField(rankGrid,'Left '+rank.label,(t.handCards||{})[rank.key]||0,v=>{t.handCards=t.handCards||{};t.handCards[rank.key]=v;recalcRound(r)})});team.appendChild(rankGrid);form.appendChild(team)});const deltaGrid=document.createElement('div');deltaGrid.className='edit-team';const dh=document.createElement('h4');dh.textContent='Manual round score override';deltaGrid.appendChild(dh);const dg=document.createElement('div');dg.className='edit-fields';createEditField(dg,state.names[0]+' round score',r.aDelta,v=>{r.aDelta=v;renderHistoryAndScores()});createEditField(dg,state.names[1]+' round score',r.bDelta,v=>{r.bDelta=v;renderHistoryAndScores()});deltaGrid.appendChild(dg);const note=document.createElement('p');note.className='hint';note.textContent='Editing a component recalculates that team’s round score. Use the manual score fields if you need to correct the final total directly.';form.append(deltaGrid,note);edit.appendChild(form);item.append(top,deltas,starter,breakdown,edit);list.appendChild(item)});}
-function recalcRound(r){['a','b'].forEach(k=>{const t=r[k];t.meld=(Number(t.meldExtra)||0)+countPoints(t.meldCards);t.hand=(Number(t.handExtra)||0)+countPoints(t.handCards);r[k+'Delta']=delta(t)});renderHistoryAndScores()}
-function renderHistoryAndScores(){save();renderScoreboard();renderHistory()}
-function render(){renderScoreboard();renderLive();renderHistory()}
-function newGame(){
-  if(!confirm('Start a new game? The current game and all its rounds will be saved under Past games.'))return;
-  if(state.rounds.length){state.pastGames=state.pastGames||[];state.pastGames.push({savedAt:new Date().toISOString(),names:[...state.names],players:[...state.players],gameStarter:state.gameStarter,rounds:JSON.parse(JSON.stringify(state.rounds))});}
-  state.rounds=[];state.gameStarter='';state.roundStarter='';
-  $('gameStarter').value='';$('roundStarter').value='';clearInputs();rebuildStarterOptions();save();render();status('New game started. Previous game is saved in Past games.');window.scrollTo({top:0,behavior:'smooth'});
+const STORAGE_KEY = 'canasta-scorekeeper-v1';
+const $ = id => document.getElementById(id);
+const num = id => Math.max(0, parseInt($(id)?.value || '0', 10) || 0);
+
+const ranks = [
+  { key: 'J', label: 'Jokers', points: 50 },
+  { key: '2', label: '2s', points: 20 },
+  { key: 'A', label: 'Aces', points: 20 },
+  { key: 'K8', label: 'Kings–8s', points: 10 },
+  { key: '74', label: '7s–4s', points: 5 },
+  { key: 'B3', label: 'Black 3s', points: 5 }
+];
+const playerIds = ['aPlayer1', 'aPlayer2', 'bPlayer1', 'bPlayer2'];
+
+let state = {
+  names: ['Team A', 'Team B'],
+  players: ['', '', '', ''],
+  gameStarter: '',
+  roundStarter: '',
+  rounds: [],
+  pastGames: []
+};
+let storageWorks = true;
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    storageWorks = true;
+  } catch (e) {
+    storageWorks = false;
+  }
+  return storageWorks;
 }
-function showPastGames(){
-  const games=state.pastGames||[];
-  if(!games.length){status('No past games saved yet.',true);return;}
-  const lines=games.map((g,i)=>`${i+1}. ${(g.names||['Team A','Team B']).join(' vs ')} — ${g.rounds?.length||0} rounds — ${new Date(g.savedAt).toLocaleString()}`);
-  const choice=prompt('PAST GAMES\n\n'+lines.join('\n')+'\n\nEnter a game number to restore it, or Cancel to keep playing. Restoring saves the current game first.');
-  if(choice===null||choice.trim()==='')return;
-  const idx=Number(choice)-1;if(!Number.isInteger(idx)||idx<0||idx>=games.length){status('That game number is not valid.',true);return;}
-  if(!confirm('Restore this past game? Your current game will be saved to Past games first.'))return;
-  if(state.rounds.length)state.pastGames.push({savedAt:new Date().toISOString(),names:[...state.names],players:[...state.players],gameStarter:state.gameStarter,rounds:JSON.parse(JSON.stringify(state.rounds))});
-  const g=state.pastGames.splice(idx,1)[0];state.names=[...(g.names||['Team A','Team B'])];state.players=[...(g.players||['','','',''])];state.gameStarter=g.gameStarter||'';state.rounds=JSON.parse(JSON.stringify(g.rounds||[]));state.roundStarter='';
-  $('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');$('gameStarter').value=state.gameStarter;$('roundStarter').value='';updateNames();rebuildStarterOptions();updateScoreLabels();clearInputs();save();render();status('Past game restored.');window.scrollTo({top:0,behavior:'smooth'});
+
+function status(msg, warn = false) {
+  const n = $('status');
+  n.textContent = msg;
+  n.className = 'status show' + (warn ? ' warn' : '');
+  clearTimeout(status.timer);
+  status.timer = setTimeout(() => n.classList.remove('show'), 4500);
 }
-function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const x=JSON.parse(raw);if(Array.isArray(x.rounds)&&Array.isArray(x.names)){state={...state,...x};state.names=[x.names[0]||'Team A',x.names[1]||'Team B'];state.players=Array.isArray(x.players)?x.players:['','','',''];state.pastGames=Array.isArray(x.pastGames)?x.pastGames:[];state.rounds=state.rounds.filter(r=>r&&r.a&&r.b&&Number.isFinite(Number(r.aDelta))&&Number.isFinite(Number(r.bDelta)));state.rounds.forEach(r=>['a','b'].forEach(k=>{const t=r[k];t.meldCards=t.meldCards||{};t.handCards=t.handCards||{};t.meldExtra=t.meldExtra??Math.max(0,(t.meld||0)-countPoints(t.meldCards));t.handExtra=t.handExtra??Math.max(0,(t.hand||0)-countPoints(t.handCards))}))}}}catch(e){storageWorks=false} $('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');$('gameStarter').value=state.gameStarter||'';$('roundStarter').value=state.roundStarter||'';updateNames();rebuildStarterOptions();updateScoreLabels();}
-// Create plus/minus controls and collapsible card-count sections.
-buildCardCounters('a');buildCardCounters('b');['aNatural','aMixed','aRed3','bNatural','bMixed','bRed3'].forEach(id=>buildStepper(id,id.endsWith('Red3')?4:999));
-ids.forEach(id=>$(id).addEventListener('input',()=>{if(id.endsWith('Red3')&&num(id)>4)$(id).value=4;renderLive()}));
-$('nameA').addEventListener('input',()=>{updateNames();rebuildStarterOptions();render()});$('nameB').addEventListener('input',()=>{updateNames();rebuildStarterOptions();render()});
-playerIds.forEach(id=>$(id).addEventListener('input',()=>{state.players=players();rebuildStarterOptions();updatePlayers();updateScoreLabels()}));$('gameStarter').addEventListener('change',()=>{state.gameStarter=$('gameStarter').value;if(!$('roundStarter').value)$('roundStarter').value=state.gameStarter;updatePlayers()});$('roundStarter').addEventListener('change',updatePlayers);
-$('scoreForm').addEventListener('submit',e=>{e.preventDefault();const a=getTeam('a'),b=getTeam('b');if(a.out&&canastas(0,a)<1){status(state.names[0]+' needs at least one canasta to go out.',true);return}if(b.out&&canastas(1,b)<1){status(state.names[1]+' needs at least one canasta to go out.',true);return}const starterVal=$('roundStarter').value;const starterName=starterVal===''?'Not recorded':(players()[Number(starterVal)]||'Not recorded');const round={time:new Date().toISOString(),starter:starterVal,starterName,a,b,aDelta:delta(a),bDelta:delta(b)};state.rounds.push(round);const count=activePlayers().length;if(count===2){state.roundStarter=nextStarterAfter(starterVal,state.rounds.length)}else if(state.rounds.length===1){state.roundStarter=''}else{state.roundStarter=nextStarterAfter(starterVal,state.rounds.length)};rebuildStarterOptions();$('roundStarter').value=state.roundStarter;save();clearInputs();render();status(storageWorks?'Round saved.':'Storage unavailable; export a backup.',!storageWorks);window.scrollTo({top:0,behavior:'smooth'})});
-$('resetFields').onclick=clearInputs;$('clearRound').onclick=clearInputs;$('newGame').onclick=newGame;$('pastGames').onclick=showPastGames;$('focusEntry').onclick=()=>$('entryPanel').scrollIntoView({behavior:'smooth'});$('focusHistory').onclick=()=>$('historyPanel').scrollIntoView({behavior:'smooth'});$('undoLast').onclick=()=>{if(!state.rounds.length)return status('There are no rounds to undo.',true);if(confirm('Undo the most recent round?')){state.rounds.pop();save();render();status('Last round undone.')}};
-$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({app:'Canasta Scorekeeper',version:2,...state},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='canasta-score-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);status('Backup exported.')};$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!Array.isArray(x.rounds)||!Array.isArray(x.names)||x.names.length!==2)throw Error('Invalid Canasta backup');if(!confirm('Restore backup and replace current scores?'))return;state={...state,...x};state.names=[x.names[0]||'Team A',x.names[1]||'Team B'];state.players=x.players||['','','',''];state.rounds.forEach(r=>['a','b'].forEach(k=>{r[k].meldCards=r[k].meldCards||{};r[k].handCards=r[k].handCards||{};r[k].meldExtra=r[k].meldExtra??Math.max(0,r[k].meld-countPoints(r[k].meldCards));r[k].handExtra=r[k].handExtra??Math.max(0,r[k].hand-countPoints(r[k].handCards))}));$('nameA').value=state.names[0];$('nameB').value=state.names[1];playerIds.forEach((id,i)=>$(id).value=state.players[i]||'');updateNames();rebuildStarterOptions();$('gameStarter').value=state.gameStarter||'';$('roundStarter').value=state.roundStarter||'';updateScoreLabels();save();clearInputs();render();status('Backup restored.')}catch(err){status(err.message||'Could not restore backup.',true)}finally{e.target.value=''}};
-load();render();if(!storageWorks)status('Browser storage unavailable. Export a backup.',true);
+
+function scoreFmt(n) {
+  return Math.round(Number(n) || 0).toLocaleString('en-US');
+}
+
+function fmt(n) {
+  n = Math.round(Number(n) || 0);
+  return (n > 0 ? '+' : '') + n.toLocaleString('en-US');
+}
+
+function red3Points(n) {
+  const count = Math.min(4, Math.max(0, Number(n) || 0));
+  return count === 4 ? 800 : count * 100;
+}
+
+function countPoints(counts) {
+  return ranks.reduce((s, r) => s + (Number(counts?.[r.key]) || 0) * r.points, 0);
+}
+
+function getCounts(prefix, section) {
+  const o = {};
+  ranks.forEach(r => {
+    o[r.key] = num(prefix + section + r.key);
+  });
+  return o;
+}
+
+/* Single canonical scoring calculation function */
+function calculateTeamScore(t) {
+  const meldCards = { ...(t.meldCards || {}) };
+  const handCards = { ...(t.handCards || {}) };
+  
+  const meldCardPts = countPoints(meldCards);
+  const meldExtra = Math.max(0, Number(t.meldExtra) || 0);
+  const totalMeld = meldCardPts + meldExtra;
+  
+  const handCardPts = countPoints(handCards);
+  const handExtra = Math.max(0, Number(t.handExtra) || 0);
+  const totalHand = handCardPts + handExtra;
+  
+  const natural = Math.max(0, Number(t.natural) || 0);
+  const naturalBonus = natural * 500;
+  
+  const mixed = Math.max(0, Number(t.mixed) || 0);
+  const mixedBonus = mixed * 300;
+  
+  const red3 = Math.min(4, Math.max(0, Number(t.red3) || 0));
+  const red3Bonus = red3Points(red3);
+  
+  const out = !!t.out;
+  const outBonus = out ? 100 : 0;
+  
+  const delta = totalMeld - totalHand + naturalBonus + mixedBonus + red3Bonus + outBonus;
+  
+  return {
+    meldCards,
+    handCards,
+    meldCardPts,
+    meldExtra,
+    meld: totalMeld,
+    totalMeld,
+    handCardPts,
+    handExtra,
+    hand: totalHand,
+    totalHand,
+    natural,
+    naturalBonus,
+    mixed,
+    mixedBonus,
+    red3,
+    red3Bonus,
+    out,
+    outBonus,
+    delta
+  };
+}
+
+function getTeam(prefix) {
+  return {
+    meldExtra: num(prefix + 'Meld'),
+    handExtra: num(prefix + 'Hand'),
+    meldCards: getCounts(prefix, 'MeldCount'),
+    handCards: getCounts(prefix, 'HandCount'),
+    natural: num(prefix + 'Natural'),
+    mixed: num(prefix + 'Mixed'),
+    red3: Math.min(4, num(prefix + 'Red3')),
+    out: !!$(prefix + 'Out')?.checked
+  };
+}
+
+function teamTotal(i) {
+  return state.rounds.reduce((s, r) => s + Number(i === 0 ? r.aDelta : r.bDelta), 0);
+}
+
+function canastas(i, extra) {
+  return state.rounds.reduce((s, r) => s + (i === 0 ? r.a.natural + r.a.mixed : r.b.natural + r.b.mixed), 0) + (extra ? extra.natural + extra.mixed : 0);
+}
+
+function minMeld(n) {
+  return n >= 3000 ? 120 : n >= 1500 ? 90 : 50;
+}
+
+function updateNames() {
+  state.names = [
+    $('nameA').value.trim() || 'Team A',
+    $('nameB').value.trim() || 'Team B'
+  ];
+  $('meldNameA').textContent = state.names[0];
+  $('meldNameB').textContent = state.names[1];
+  $('entryNameA').textContent = state.names[0];
+  $('entryNameB').textContent = state.names[1];
+  $('liveScoreNameA').textContent = state.names[0] + ' round';
+  $('liveScoreNameB').textContent = state.names[1] + ' round';
+  if ($('floatNameA')) $('floatNameA').textContent = state.names[0];
+  if ($('floatNameB')) $('floatNameB').textContent = state.names[1];
+  updateScoreLabels();
+  save();
+}
+
+function updateScoreLabels() {
+  const ps = players();
+  $('scoreLabelA').textContent = ps[0] || state.names[0];
+  $('scoreLabelB').textContent = ps[2] || state.names[1];
+  $('scoreLabelA').title = state.names[0];
+  $('scoreLabelB').title = state.names[1];
+}
+
+function players() {
+  return playerIds.map(id => $(id).value.trim());
+}
+
+function rebuildStarterOptions() {
+  const ps = players();
+  const options = [];
+  ps.forEach((name, i) => {
+    if (name) {
+      options.push({
+        value: String(i),
+        label: name + ' (' + (i === 0 || i === 1 ? state.names[0] : state.names[1]) + ')'
+      });
+    }
+  });
+  const fill = (sel, selected, placeholder) => {
+    const old = selected ?? sel.value;
+    sel.innerHTML = '';
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = placeholder;
+    sel.appendChild(opt);
+    options.forEach(o => {
+      const x = document.createElement('option');
+      x.value = o.value;
+      x.textContent = o.label;
+      sel.appendChild(x);
+    });
+    if ([...sel.options].some(o => o.value === String(old))) sel.value = String(old);
+  };
+  fill($('gameStarter'), state.gameStarter, 'Select first player');
+  const roundChoice = state.roundStarter !== '' ? state.roundStarter : (state.rounds.length === 0 ? state.gameStarter : '');
+  fill($('roundStarter'), roundChoice, 'Select round starter');
+}
+
+function activePlayers() {
+  return players().map((name, i) => ({ name, index: i })).filter(p => p.name);
+}
+
+function nextStarterAfter(savedStarter, roundCount) {
+  const ps = activePlayers();
+  if (ps.length < 2) return '';
+  const current = Number(savedStarter);
+  if (!Number.isInteger(current) || !ps.some(p => p.index === current)) return '';
+  if (ps.length === 2) {
+    return String(ps.find(p => p.index !== current)?.index ?? '');
+  }
+  if (roundCount < 2) return '';
+  const pos = ps.findIndex(p => p.index === current);
+  return String(ps[(pos + 1) % ps.length].index);
+}
+
+function updatePlayers() {
+  state.players = players();
+  state.gameStarter = $('gameStarter').value;
+  state.roundStarter = $('roundStarter').value;
+  save();
+}
+
+function renderScoreboard() {
+  const a = teamTotal(0), b = teamTotal(1);
+  $('scoreA').textContent = scoreFmt(a);
+  $('scoreB').textContent = scoreFmt(b);
+  ['A', 'B'].forEach((x, i) => {
+    const v = i ? b : a;
+    $('progress' + x).style.width = Math.max(0, Math.min(100, v / 50)) + '%';
+    $('pct' + x).textContent = Math.max(0, Math.round(v / 50)) + '%';
+  });
+  $('meldA').textContent = minMeld(a) + ' points';
+  $('meldB').textContent = minMeld(b) + ' points';
+  $('meldHintA').textContent = 'Current score: ' + scoreFmt(a);
+  $('meldHintB').textContent = 'Current score: ' + scoreFmt(b);
+  
+  let msg = 'Progress to 5,000 points';
+  if (a >= 5000 && canastas(0) > 0) msg = '🏆 ' + state.names[0] + ' has reached 5,000 points!';
+  else if (b >= 5000 && canastas(1) > 0) msg = '🏆 ' + state.names[1] + ' has reached 5,000 points!';
+  else if (a >= 5000) msg = state.names[0] + ' reached 5,000 but still needs a canasta to go out.';
+  else if (b >= 5000) msg = state.names[1] + ' reached 5,000 but still needs a canasta to go out.';
+  $('gameStatus').textContent = msg;
+}
+
+function renderLive() {
+  const a = calculateTeamScore(getTeam('a'));
+  const b = calculateTeamScore(getTeam('b'));
+  
+  $('aRoundTotal').textContent = fmt(a.delta);
+  $('bRoundTotal').textContent = fmt(b.delta);
+  
+  const am = $('aMeldTotal'), bm = $('bMeldTotal');
+  const ah = $('aHandTotal'), bh = $('bHandTotal');
+  if (am) am.textContent = scoreFmt(a.totalMeld) + ' pts';
+  if (bm) bm.textContent = scoreFmt(b.totalMeld) + ' pts';
+  if (ah) ah.textContent = scoreFmt(a.totalHand) + ' pts';
+  if (bh) bh.textContent = scoreFmt(b.totalHand) + ' pts';
+
+  // Floating bottom score summary updates
+  const aCumulative = teamTotal(0);
+  const bCumulative = teamTotal(1);
+  const aLiveTotal = aCumulative + a.delta;
+  const bLiveTotal = bCumulative + b.delta;
+
+  if ($('floatRoundA')) $('floatRoundA').textContent = fmt(a.delta);
+  if ($('floatRoundB')) $('floatRoundB').textContent = fmt(b.delta);
+  if ($('floatTotalA')) $('floatTotalA').textContent = scoreFmt(aLiveTotal);
+  if ($('floatTotalB')) $('floatTotalB').textContent = scoreFmt(bLiveTotal);
+}
+
+function stepCount(id, delta, max = 999) {
+  const inp = $(id);
+  if (!inp) return;
+  const current = Math.max(0, parseInt(inp.value || '0', 10) || 0);
+  const next = Math.max(0, Math.min(max, current + delta));
+  inp.value = String(next);
+  const valSpan = $(id + 'Val');
+  if (valSpan) valSpan.textContent = String(next);
+  renderLive();
+}
+
+function populateCardRows(containerId, prefix, section) {
+  const container = $(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  
+  ranks.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'count-row';
+    
+    const label = document.createElement('span');
+    label.className = 'count-label';
+    label.textContent = r.label + ' (' + r.points + ' pts)';
+    
+    const minus = document.createElement('button');
+    minus.type = 'button';
+    minus.className = 'count-btn';
+    minus.textContent = '−';
+    minus.setAttribute('aria-label', `Decrease ${prefix.toUpperCase()} ${r.label}`);
+    
+    const val = document.createElement('span');
+    val.className = 'count-value';
+    val.id = prefix + section + r.key + 'Val';
+    val.textContent = '0';
+    
+    const plus = document.createElement('button');
+    plus.type = 'button';
+    plus.className = 'count-btn';
+    plus.textContent = '+';
+    plus.setAttribute('aria-label', `Increase ${prefix.toUpperCase()} ${r.label}`);
+    
+    const inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.id = prefix + section + r.key;
+    inp.value = '0';
+    
+    minus.onclick = () => stepCount(inp.id, -1);
+    plus.onclick = () => stepCount(inp.id, 1);
+    
+    row.append(label, minus, val, plus, inp);
+    container.appendChild(row);
+  });
+  
+  if (section === 'MeldCount') {
+    const extraWrap = document.createElement('div');
+    extraWrap.className = 'extra-field';
+    const extraLabel = document.createElement('label');
+    extraLabel.setAttribute('for', prefix + 'Meld');
+    extraLabel.textContent = 'Extra meld points (optional)';
+    const extraInput = document.createElement('input');
+    extraInput.id = prefix + 'Meld';
+    extraInput.type = 'number';
+    extraInput.inputMode = 'numeric';
+    extraInput.min = '0';
+    extraInput.step = '5';
+    extraInput.value = '0';
+    extraInput.addEventListener('input', renderLive);
+    extraWrap.append(extraLabel, extraInput);
+    
+    const subtotal = document.createElement('div');
+    subtotal.className = 'subtotal-row';
+    subtotal.innerHTML = `<span>Calculated meld points</span><strong id="${prefix}MeldTotal">0 pts</strong>`;
+    
+    container.append(extraWrap, subtotal);
+  } else if (section === 'HandCount') {
+    const extraWrap = document.createElement('div');
+    extraWrap.className = 'extra-field';
+    const extraLabel = document.createElement('label');
+    extraLabel.setAttribute('for', prefix + 'Hand');
+    extraLabel.textContent = 'Extra hand points to subtract (optional)';
+    const extraInput = document.createElement('input');
+    extraInput.id = prefix + 'Hand';
+    extraInput.type = 'number';
+    extraInput.inputMode = 'numeric';
+    extraInput.min = '0';
+    extraInput.step = '5';
+    extraInput.value = '0';
+    extraInput.addEventListener('input', renderLive);
+    extraWrap.append(extraLabel, extraInput);
+    
+    const subtotal = document.createElement('div');
+    subtotal.className = 'subtotal-row';
+    subtotal.innerHTML = `<span>Calculated cards left</span><strong id="${prefix}HandTotal">0 pts</strong>`;
+    
+    container.append(extraWrap, subtotal);
+  }
+}
+
+function setAllSectionsExpanded(expanded = true) {
+  ['secBonus', 'secMeld', 'secHand'].forEach(id => {
+    const sec = $(id);
+    if (!sec) return;
+    sec.classList.toggle('expanded', expanded);
+    const btn = sec.querySelector('.shared-section-header');
+    if (btn) btn.setAttribute('aria-expanded', String(expanded));
+    const glyph = sec.querySelector('.toggle-glyph');
+    if (glyph) glyph.textContent = expanded ? '−' : '＋';
+  });
+  const entryDetails = $('entryDetails');
+  if (entryDetails) entryDetails.open = expanded;
+}
+
+function toggleSection(secId) {
+  const sec = $(secId);
+  if (!sec) return;
+  const isExpanded = sec.classList.toggle('expanded');
+  const btn = sec.querySelector('.shared-section-header');
+  if (btn) btn.setAttribute('aria-expanded', String(isExpanded));
+  const glyph = sec.querySelector('.toggle-glyph');
+  if (glyph) glyph.textContent = isExpanded ? '−' : '＋';
+}
+
+function clearInputs() {
+  ['aMeld', 'bMeld', 'aHand', 'bHand'].forEach(id => {
+    const el = $(id);
+    if (el) el.value = '0';
+  });
+  ['aOut', 'bOut'].forEach(id => {
+    const el = $(id);
+    if (el) el.checked = false;
+  });
+  document.querySelectorAll('#scoreForm input[type="hidden"]').forEach(inp => {
+    inp.value = '0';
+    const valSpan = $(inp.id + 'Val');
+    if (valSpan) valSpan.textContent = '0';
+  });
+  document.querySelectorAll('.count-value').forEach(n => n.textContent = '0');
+  
+  setAllSectionsExpanded(true);
+  renderLive();
+  save();
+}
+
+function createEditField(container, label, value, onchange, type = 'number') {
+  const wrap = document.createElement('div'),
+        lab = document.createElement('label'),
+        input = document.createElement('input');
+  lab.textContent = label;
+  input.type = type;
+  input.value = value ?? 0;
+  if (type === 'number') {
+    input.min = '0';
+    input.step = '1';
+  }
+  input.addEventListener('change', () => onchange(type === 'number' ? Math.max(0, Number(input.value) || 0) : input.value));
+  wrap.append(lab, input);
+  container.appendChild(wrap);
+}
+
+function renderHistory() {
+  const list = $('historyList');
+  $('roundCount').textContent = state.rounds.length + (state.rounds.length === 1 ? ' round' : ' rounds');
+  list.innerHTML = '';
+  if (!state.rounds.length) {
+    list.innerHTML = '<div class="empty">No rounds recorded yet. Add your first round above.</div>';
+    return;
+  }
+  
+  [...state.rounds].reverse().forEach((r, rev) => {
+    const i = state.rounds.length - 1 - rev;
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    
+    const top = document.createElement('div');
+    top.className = 'history-top';
+    const left = document.createElement('div'),
+          title = document.createElement('div'),
+          date = document.createElement('div');
+    title.className = 'history-date';
+    title.textContent = 'Round ' + (i + 1);
+    date.className = 'history-sub';
+    const d = new Date(r.time);
+    date.textContent = Number.isNaN(d.getTime()) ? '' : d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    left.append(title, date);
+    
+    const del = document.createElement('button');
+    del.className = 'delete-round';
+    del.type = 'button';
+    del.textContent = 'Delete';
+    del.onclick = () => {
+      if (confirm('Delete round ' + (i + 1) + '?')) {
+        state.rounds.splice(i, 1);
+        save();
+        render();
+        status('Round deleted.');
+      }
+    };
+    top.append(left, del);
+    
+    const deltas = document.createElement('div');
+    deltas.className = 'history-deltas';
+    const da = document.createElement('div'), db = document.createElement('div');
+    da.className = 'delta a';
+    db.className = 'delta b';
+    da.textContent = state.names[0] + ': ' + fmt(r.aDelta);
+    db.textContent = state.names[1] + ': ' + fmt(r.bDelta);
+    deltas.append(da, db);
+    
+    const starter = document.createElement('div');
+    starter.className = 'history-sub';
+    starter.textContent = 'Started by: ' + (r.starterName || 'Not recorded');
+    
+    const breakdown = document.createElement('div');
+    breakdown.className = 'history-breakdown';
+    breakdown.textContent = `${state.names[0]}: meld ${scoreFmt(r.a.totalMeld || r.a.meld)} − hand ${scoreFmt(r.a.totalHand || r.a.hand)}, natural ${r.a.natural} (+${scoreFmt(r.a.naturalBonus || r.a.natural * 500)}), mixed ${r.a.mixed} (+${scoreFmt(r.a.mixedBonus || r.a.mixed * 300)}), red 3s ${r.a.red3} (+${scoreFmt(r.a.red3Bonus || red3Points(r.a.red3))})${r.a.out ? ', went out (+100)' : ''} · ${state.names[1]}: meld ${scoreFmt(r.b.totalMeld || r.b.meld)} − hand ${scoreFmt(r.b.totalHand || r.b.hand)}, natural ${r.b.natural} (+${scoreFmt(r.b.naturalBonus || r.b.natural * 500)}), mixed ${r.b.mixed} (+${scoreFmt(r.b.mixedBonus || r.b.mixed * 300)}), red 3s ${r.b.red3} (+${scoreFmt(r.b.red3Bonus || red3Points(r.b.red3))})${r.b.out ? ', went out (+100)' : ''}`;
+    
+    const edit = document.createElement('details');
+    edit.className = 'round-edit';
+    const sum = document.createElement('summary');
+    sum.textContent = 'Edit this round';
+    edit.appendChild(sum);
+    
+    const form = document.createElement('div');
+    form.className = 'rules-content';
+    
+    [r.a, r.b].forEach((t, ti) => {
+      const team = document.createElement('div');
+      team.className = 'edit-team';
+      const h = document.createElement('h4');
+      h.textContent = state.names[ti];
+      team.appendChild(h);
+      
+      const grid = document.createElement('div');
+      grid.className = 'edit-fields';
+      createEditField(grid, 'Extra meld points', t.meldExtra ?? Math.max(0, (t.totalMeld || t.meld || 0) - countPoints(t.meldCards)), v => { t.meldExtra = v; recalcRound(r); });
+      createEditField(grid, 'Extra hand points', t.handExtra ?? Math.max(0, (t.totalHand || t.hand || 0) - countPoints(t.handCards)), v => { t.handExtra = v; recalcRound(r); });
+      createEditField(grid, 'Natural canastas', t.natural, v => { t.natural = v; recalcRound(r); });
+      createEditField(grid, 'Mixed canastas', t.mixed, v => { t.mixed = v; recalcRound(r); });
+      createEditField(grid, 'Red 3s (0–4)', t.red3, v => { t.red3 = Math.min(4, v); recalcRound(r); });
+      team.appendChild(grid);
+      
+      const outLabel = document.createElement('label'),
+            out = document.createElement('input');
+      out.type = 'checkbox';
+      out.checked = !!t.out;
+      outLabel.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:700';
+      outLabel.append(out, document.createTextNode('Went out (+100)'));
+      out.onchange = () => { t.out = out.checked; recalcRound(r); };
+      team.appendChild(outLabel);
+      
+      const rankGrid = document.createElement('div');
+      rankGrid.className = 'edit-fields';
+      rankGrid.style.marginTop = '10px';
+      ranks.forEach(rank => {
+        createEditField(rankGrid, 'Melded ' + rank.label, (t.meldCards || {})[rank.key] || 0, v => {
+          t.meldCards = t.meldCards || {};
+          t.meldCards[rank.key] = v;
+          recalcRound(r);
+        });
+        createEditField(rankGrid, 'Left ' + rank.label, (t.handCards || {})[rank.key] || 0, v => {
+          t.handCards = t.handCards || {};
+          t.handCards[rank.key] = v;
+          recalcRound(r);
+        });
+      });
+      team.appendChild(rankGrid);
+      form.appendChild(team);
+    });
+    
+    const deltaGrid = document.createElement('div');
+    deltaGrid.className = 'edit-team';
+    const dh = document.createElement('h4');
+    dh.textContent = 'Manual round score override';
+    deltaGrid.appendChild(dh);
+    const dg = document.createElement('div');
+    dg.className = 'edit-fields';
+    createEditField(dg, state.names[0] + ' round score', r.aDelta, v => { r.aDelta = v; renderHistoryAndScores(); });
+    createEditField(dg, state.names[1] + ' round score', r.bDelta, v => { r.bDelta = v; renderHistoryAndScores(); });
+    deltaGrid.appendChild(dg);
+    const note = document.createElement('p');
+    note.className = 'hint';
+    note.textContent = 'Editing a component recalculates that team’s round score. Use manual score fields if you need to correct the final total directly.';
+    form.append(deltaGrid, note);
+    edit.appendChild(form);
+    
+    item.append(top, deltas, starter, breakdown, edit);
+    list.appendChild(item);
+  });
+}
+
+function recalcRound(r) {
+  ['a', 'b'].forEach(k => {
+    r[k] = calculateTeamScore(r[k]);
+    r[k + 'Delta'] = r[k].delta;
+  });
+  renderHistoryAndScores();
+}
+
+function renderHistoryAndScores() {
+  save();
+  renderScoreboard();
+  renderLive();
+  renderHistory();
+}
+
+function render() {
+  renderScoreboard();
+  renderLive();
+  renderHistory();
+}
+
+function newGame() {
+  if (!confirm('Start a new game? The current game and all its rounds will be saved under Past games.')) return;
+  if (state.rounds.length) {
+    state.pastGames = state.pastGames || [];
+    state.pastGames.push({
+      savedAt: new Date().toISOString(),
+      names: [...state.names],
+      players: [...state.players],
+      gameStarter: state.gameStarter,
+      rounds: JSON.parse(JSON.stringify(state.rounds))
+    });
+  }
+  state.rounds = [];
+  state.gameStarter = '';
+  state.roundStarter = '';
+  if ($('gameStarter')) $('gameStarter').value = '';
+  if ($('roundStarter')) $('roundStarter').value = '';
+  clearInputs();
+  rebuildStarterOptions();
+  save();
+  render();
+  status('New game started. Previous game is saved in Past games.');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showPastGames() {
+  const games = state.pastGames || [];
+  if (!games.length) {
+    status('No past games saved yet.', true);
+    return;
+  }
+  const lines = games.map((g, i) => `${i + 1}. ${(g.names || ['Team A', 'Team B']).join(' vs ')} — ${g.rounds?.length || 0} rounds — ${new Date(g.savedAt).toLocaleString()}`);
+  const choice = prompt('PAST GAMES\n\n' + lines.join('\n') + '\n\nEnter a game number to restore it, or Cancel to keep playing. Restoring saves the current game first.');
+  if (choice === null || choice.trim() === '') return;
+  const idx = Number(choice) - 1;
+  if (!Number.isInteger(idx) || idx < 0 || idx >= games.length) {
+    status('That game number is not valid.', true);
+    return;
+  }
+  if (!confirm('Restore this past game? Your current game will be saved to Past games first.')) return;
+  if (state.rounds.length) {
+    state.pastGames.push({
+      savedAt: new Date().toISOString(),
+      names: [...state.names],
+      players: [...state.players],
+      gameStarter: state.gameStarter,
+      rounds: JSON.parse(JSON.stringify(state.rounds))
+    });
+  }
+  const g = state.pastGames.splice(idx, 1)[0];
+  state.names = [...(g.names || ['Team A', 'Team B'])];
+  state.players = [...(g.players || ['', '', '', ''])];
+  state.gameStarter = g.gameStarter || '';
+  state.rounds = JSON.parse(JSON.stringify(g.rounds || []));
+  state.roundStarter = '';
+  $('nameA').value = state.names[0];
+  $('nameB').value = state.names[1];
+  playerIds.forEach((id, i) => $(id).value = state.players[i] || '');
+  if ($('gameStarter')) $('gameStarter').value = state.gameStarter;
+  if ($('roundStarter')) $('roundStarter').value = '';
+  updateNames();
+  rebuildStarterOptions();
+  updateScoreLabels();
+  clearInputs();
+  save();
+  render();
+  status('Past game restored.');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const x = JSON.parse(raw);
+      if (Array.isArray(x.rounds) && Array.isArray(x.names)) {
+        state = { ...state, ...x };
+        state.names = [x.names[0] || 'Team A', x.names[1] || 'Team B'];
+        state.players = Array.isArray(x.players) ? x.players : ['', '', '', ''];
+        state.pastGames = Array.isArray(x.pastGames) ? x.pastGames : [];
+        state.rounds = state.rounds.filter(r => r && r.a && r.b && Number.isFinite(Number(r.aDelta)) && Number.isFinite(Number(r.bDelta)));
+        state.rounds.forEach(r => {
+          ['a', 'b'].forEach(k => {
+            r[k] = calculateTeamScore(r[k]);
+          });
+        });
+      }
+    }
+  } catch (e) {
+    storageWorks = false;
+  }
+  $('nameA').value = state.names[0];
+  $('nameB').value = state.names[1];
+  playerIds.forEach((id, i) => $(id).value = state.players[i] || '');
+  if ($('gameStarter')) $('gameStarter').value = state.gameStarter || '';
+  if ($('roundStarter')) $('roundStarter').value = state.roundStarter || '';
+  updateNames();
+  rebuildStarterOptions();
+  updateScoreLabels();
+}
+
+/* Initialize card counters */
+populateCardRows('aMeldContainer', 'a', 'MeldCount');
+populateCardRows('bMeldContainer', 'b', 'MeldCount');
+populateCardRows('aHandContainer', 'a', 'HandCount');
+populateCardRows('bHandContainer', 'b', 'HandCount');
+
+/* Setup event delegation for stepper buttons with data-step */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-step]');
+  if (!btn) return;
+  const targetId = btn.getAttribute('data-step');
+  const delta = Number(btn.getAttribute('data-delta')) || 0;
+  const max = btn.hasAttribute('data-max') ? Number(btn.getAttribute('data-max')) : 999;
+  stepCount(targetId, delta, max);
+});
+
+/* Toggle section handlers */
+$('toggleBonus').onclick = () => toggleSection('secBonus');
+$('toggleMeld').onclick = () => toggleSection('secMeld');
+$('toggleHand').onclick = () => toggleSection('secHand');
+
+/* Checkbox and input listeners */
+['aOut', 'bOut'].forEach(id => {
+  const el = $(id);
+  if (el) {
+    el.addEventListener('change', renderLive);
+    el.addEventListener('input', renderLive);
+  }
+});
+
+$('nameA').addEventListener('input', () => { updateNames(); rebuildStarterOptions(); render(); });
+$('nameB').addEventListener('input', () => { updateNames(); rebuildStarterOptions(); render(); });
+
+playerIds.forEach(id => $(id).addEventListener('input', () => {
+  state.players = players();
+  rebuildStarterOptions();
+  updatePlayers();
+  updateScoreLabels();
+}));
+
+$('gameStarter').addEventListener('change', () => {
+  state.gameStarter = $('gameStarter').value;
+  if (!$('roundStarter').value) $('roundStarter').value = state.gameStarter;
+  updatePlayers();
+});
+$('roundStarter').addEventListener('change', updatePlayers);
+
+/* Form submit: save round */
+$('scoreForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const aRaw = getTeam('a'), bRaw = getTeam('b');
+  const a = calculateTeamScore(aRaw), b = calculateTeamScore(bRaw);
+  
+  if (a.out && (a.natural + a.mixed) < 1) {
+    status(state.names[0] + ' needs at least one canasta to go out.', true);
+    return;
+  }
+  if (b.out && (b.natural + b.mixed) < 1) {
+    status(state.names[1] + ' needs at least one canasta to go out.', true);
+    return;
+  }
+  
+  const starterVal = $('roundStarter').value;
+  const starterName = starterVal === '' ? 'Not recorded' : (players()[Number(starterVal)] || 'Not recorded');
+  
+  const round = {
+    time: new Date().toISOString(),
+    starter: starterVal,
+    starterName,
+    a,
+    b,
+    aDelta: a.delta,
+    bDelta: b.delta
+  };
+  
+  state.rounds.push(round);
+  
+  const count = activePlayers().length;
+  if (count === 2) {
+    state.roundStarter = nextStarterAfter(starterVal, state.rounds.length);
+  } else if (state.rounds.length === 1) {
+    state.roundStarter = '';
+  } else {
+    state.roundStarter = nextStarterAfter(starterVal, state.rounds.length);
+  }
+  rebuildStarterOptions();
+  $('roundStarter').value = state.roundStarter;
+  
+  save();
+  clearInputs();
+  render();
+  status(storageWorks ? 'Round saved.' : 'Storage unavailable; export a backup.', !storageWorks);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+$('resetFields').onclick = clearInputs;
+$('clearRound').onclick = clearInputs;
+$('newGame').onclick = newGame;
+$('pastGames').onclick = showPastGames;
+$('focusEntry').onclick = () => $('entryPanel').scrollIntoView({ behavior: 'smooth' });
+$('focusHistory').onclick = () => $('historyPanel').scrollIntoView({ behavior: 'smooth' });
+$('undoLast').onclick = () => {
+  if (!state.rounds.length) return status('There are no rounds to undo.', true);
+  if (confirm('Undo the most recent round?')) {
+    state.rounds.pop();
+    save();
+    render();
+    status('Last round undone.');
+  }
+};
+
+$('exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify({ app: 'Canasta Scorekeeper', version: 2, ...state }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url;
+  a.download = 'canasta-score-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  status('Backup exported.');
+};
+
+$('importBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = async e => {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  try {
+    const x = JSON.parse(await f.text());
+    if (!Array.isArray(x.rounds) || !Array.isArray(x.names) || x.names.length !== 2) throw Error('Invalid Canasta backup');
+    if (!confirm('Restore backup and replace current scores?')) return;
+    state = { ...state, ...x };
+    state.names = [x.names[0] || 'Team A', x.names[1] || 'Team B'];
+    state.players = x.players || ['', '', '', ''];
+    state.rounds.forEach(r => {
+      ['a', 'b'].forEach(k => {
+        r[k] = calculateTeamScore(r[k]);
+      });
+    });
+    $('nameA').value = state.names[0];
+    $('nameB').value = state.names[1];
+    playerIds.forEach((id, i) => $(id).value = state.players[i] || '');
+    updateNames();
+    rebuildStarterOptions();
+    if ($('gameStarter')) $('gameStarter').value = state.gameStarter || '';
+    if ($('roundStarter')) $('roundStarter').value = state.roundStarter || '';
+    updateScoreLabels();
+    save();
+    clearInputs();
+    render();
+    status('Backup restored.');
+  } catch (err) {
+    status(err.message || 'Could not restore backup.', true);
+  } finally {
+    e.target.value = '';
+  }
+};
+
+load();
+clearInputs();
+render();
+if (!storageWorks) status('Browser storage unavailable. Export a backup.', true);
 })();
 </script>
 <script>
