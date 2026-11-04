@@ -17,7 +17,7 @@ h1{font-size:clamp(1.15rem,3vw,1.65rem);margin:0;letter-spacing:-.04em}
 .offline{font-size:.65rem;font-weight:800;border:1px solid #ffffff55;border-radius:30px;padding:6px 9px;white-space:nowrap}
 main{width:min(100%,1100px);height:calc(100dvh - 54px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:0;margin:0 auto;padding:10px 14px 12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:9px}
 .setup{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px}
-.player{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 10px;background:var(--paper);border-radius:12px;border:1px solid var(--line)}
+.player{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 10px;background:var(--paper);border-radius:12px;border:2px solid var(--line);transition:border-color .2s}.player.active.a{border-color:var(--a);animation:turn-a 1s ease-in-out infinite}.player.active.b{border-color:var(--b);animation:turn-b 1s ease-in-out infinite}@keyframes turn-a{50%{box-shadow:0 0 0 4px #8f3d5f30}}@keyframes turn-b{50%{box-shadow:0 0 0 4px #9a6a1730}}
 .player.b{flex-direction:row-reverse;text-align:right}
 .player-mark{width:10px;height:30px;border-radius:8px;flex:0 0 10px;background:var(--a)}.player.b .player-mark{background:var(--b)}
 .player input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font-weight:850;font-size:clamp(.78rem,2.2vw,1rem);padding:3px}
@@ -27,9 +27,9 @@ main{width:min(100%,1100px);height:calc(100dvh - 54px - env(safe-area-inset-top)
 .board-wrap{width:100%;height:100%;min-height:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#f6f2e7 0,#fffefa 70%);border-radius:13px}
 svg{display:block;width:100%;height:100%;max-width:900px;touch-action:manipulation}
 .player-label{font-size:12px;font-weight:850;fill:var(--ink)}.node-text{font-size:15px;font-weight:900;fill:#26352f;dominant-baseline:middle;text-anchor:middle}
-.node{fill:#fff;stroke-width:2.5}.node-hit{cursor:grab;touch-action:none}.node-hit:active{cursor:grabbing}.node-hit.target .node{stroke:var(--gold);stroke-width:4;filter:drop-shadow(0 0 4px #e6b75a88)}.drag-line{stroke:var(--gold);stroke-width:4;stroke-dasharray:7 5;stroke-linecap:round;pointer-events:none}.node.done.a{fill:#f8e8ef;stroke:var(--a)}.node.done.b{fill:#fbf0d9;stroke:var(--b)}
+.node{fill:#fff;stroke-width:2.5}.node-hit{cursor:grab;touch-action:none}.node-hit:active{cursor:grabbing}.node-hit.target .node{stroke:var(--gold);stroke-width:4;filter:drop-shadow(0 0 4px #e6b75a88);animation:target-pulse .8s ease-in-out infinite}.node-hit.target.a .node{stroke:var(--a)}.node-hit.target.b .node{stroke:var(--b)}@keyframes target-pulse{50%{stroke-width:7;filter:drop-shadow(0 0 7px currentColor)}}.drag-line{stroke:var(--gold);stroke-width:4;stroke-dasharray:7 5;stroke-linecap:round;pointer-events:none}.node.done.a{fill:#f8e8ef;stroke:var(--a)}.node.done.b{fill:#fbf0d9;stroke:var(--b)}
 .connection{fill:none;stroke-width:4;stroke-linecap:round;opacity:.85}.connection.a{stroke:var(--a)}.connection.b{stroke:var(--b)}
-.center{fill:#174e4f;stroke:#e6b75a;stroke-width:4}.center-text{fill:white;font-size:12px;font-weight:900;text-anchor:middle;dominant-baseline:middle}
+.die-face{fill:#fff;stroke:#aab8ae;stroke-width:3;cursor:pointer;filter:drop-shadow(0 5px 3px #173c3330)}.die-glyph{font-size:48px;text-anchor:middle;dominant-baseline:middle;pointer-events:none;fill:#174e4f}.dice-control{cursor:pointer;touch-action:manipulation}.dice-control.active-a .die-face{stroke:var(--a);stroke-width:5;animation:dice-glow-a .9s ease-in-out infinite}.dice-control.active-b .die-face{stroke:var(--b);stroke-width:5;animation:dice-glow-b .9s ease-in-out infinite}.dice-control.rolling .die-face{animation:dice-tumble .18s linear infinite}.dice-control:focus{outline:none}.dice-control:focus .die-face{stroke:var(--gold);stroke-width:6}@keyframes dice-glow-a{50%{filter:drop-shadow(0 0 9px #8f3d5f)}}@keyframes dice-glow-b{50%{filter:drop-shadow(0 0 9px #9a6a17)}}
 .bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
 .status{min-width:0;display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:8px 12px}
 .die{width:76px;height:76px;flex:0 0 76px;border-radius:17px;background:linear-gradient(145deg,#fff 0%,#f1f3ef 100%);border:2px solid #d7dfd8;display:grid;place-items:center;font-size:4.25rem;line-height:1;box-shadow:0 7px 0 #cbd5cd,0 10px 18px #173c3326;transform-origin:center;perspective:500px;user-select:none}.die.rolling{animation:dice-tumble .18s linear infinite}@keyframes dice-tumble{0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}25%{transform:rotateX(95deg) rotateY(110deg) rotateZ(35deg) scale(1.08)}50%{transform:rotateX(190deg) rotateY(205deg) rotateZ(75deg) scale(.96)}75%{transform:rotateX(285deg) rotateY(300deg) rotateZ(115deg) scale(1.08)}100%{transform:rotateX(360deg) rotateY(405deg) rotateZ(155deg) scale(1)}}
@@ -76,14 +76,13 @@ header{flex-basis:40px}main{height:calc(100dvh - 40px - env(safe-area-inset-top)
 <text x="70" y="17" text-anchor="middle" class="player-label" id="labelA">PLAYER 1</text>
 <text x="290" y="286" text-anchor="middle" class="player-label" id="labelB">PLAYER 2</text>
 <g id="linesA"></g><g id="linesB"></g><line id="dragLine" class="drag-line" x1="0" y1="0" x2="0" y2="0" style="display:none"></line>
-<circle class="center" cx="180" cy="150" r="27"></circle><text class="center-text" x="180" y="150">GOAL</text>
+<g id="diceControl" class="dice-control" role="button" tabindex="0" aria-label="Roll dice"><rect class="die-face" x="145" y="115" width="70" height="70" rx="15"></rect><text id="boardDie" class="die-glyph" x="180" y="151">⚄</text></g>
 <g id="nodesA"></g><g id="nodesB"></g>
 </svg>
 </div>
 </section>
 <div class="bottom">
 <div class="status">
- <div class="die" id="die" aria-label="Dice result">⚄</div>
  <div class="status-copy"><strong id="turnName">Player 1's turn</strong><span id="rollDescription">Roll the dice to connect a number.</span><div class="message" id="message" role="status" aria-live="polite">Player 1 starts. Good luck!</div></div>
 </div>
 <div class="controls">
@@ -107,26 +106,27 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){}}
 function esc(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function name(i){return state.names[i]||('Player '+(i+1));}
 function makeNodes(target,positions,player){
-$(target).innerHTML=positions.map(p=>'<g class="node-hit '+(state.pendingRoll===p.n&&state.turn===player?'target':'')+'" data-node="1" data-player="'+player+'" data-number="'+p.n+'"><circle class="node '+(state.connected[player].includes(p.n)?'done '+(player===0?'a':'b'):'')+'" cx="'+p.x+'" cy="'+p.y+'" r="19"></circle><text class="node-text" x="'+p.x+'" y="'+p.y+'" pointer-events="none">'+p.n+'</text></g>').join('');
+$(target).innerHTML=positions.map(p=>'<g class="node-hit '+(state.pendingRoll===p.n&&state.turn===player?'target '+(player===0?'a':'b'):'')+'" data-node="1" data-player="'+player+'" data-number="'+p.n+'"><circle class="node '+(state.connected[player].includes(p.n)?'done '+(player===0?'a':'b'):'')+'" cx="'+p.x+'" cy="'+p.y+'" r="19"></circle><text class="node-text" x="'+p.x+'" y="'+p.y+'" pointer-events="none">'+p.n+'</text></g>').join('');
 }
 function makeLines(target,positions,player){
 $(target).innerHTML=state.connected[player].map(n=>{const p=positions.find(v=>v.n===n);return '<line class="connection '+(player===0?'a':'b')+'" x1="'+p.x+'" y1="'+p.y+'" x2="180" y2="150"></line>';}).join('');
 }
 function render(){
 $('nameA').value=state.names[0];$('nameB').value=state.names[1];
-$('labelA').textContent=name(0).toUpperCase();$('labelB').textContent=name(1).toUpperCase();
+$('labelA').textContent=name(0).toUpperCase();$('labelB').textContent=name(1).toUpperCase();$('nameA').parentElement.classList.toggle('active',state.winner===null&&state.turn===0);$('nameB').parentElement.classList.toggle('active',state.winner===null&&state.turn===1);
 makeLines('linesA',positionsA,0);makeLines('linesB',positionsB,1);makeNodes('nodesA',positionsA,0);makeNodes('nodesB',positionsB,1);
 $('statA').textContent=state.connected[0].length+'/6';$('statB').textContent=state.connected[1].length+'/6';
 $('turnName').textContent=state.winner!==null?name(state.winner)+' wins!':name(state.turn)+"'s turn";
 $('rollDescription').textContent=state.winner!==null?'Game complete — start a new game.':'Roll to connect your number to the centre.';
 
 $('roll').disabled=state.winner!==null||state.pendingRoll!==null||rolling;
-$('roll').hidden=state.pendingRoll!==null;
+$('roll').hidden=true;
+$('diceControl').classList.toggle('active-a',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===0);$('diceControl').classList.toggle('active-b',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===1);$('diceControl').classList.toggle('rolling',rolling);$('diceControl').setAttribute('aria-label',state.pendingRoll!==null?'Drag '+state.pendingRoll+' to the dice':'Roll dice for '+name(state.turn));
 $('undo').disabled=state.history.length===0||rolling;$('newGame').disabled=rolling;
 $('roll').textContent=state.winner!==null?'Finished':'🎲 Roll';
-if(state.lastRoll!==null){$('die').textContent=dice[state.lastRoll-1];}else{$('die').textContent='⚄';}
+$('boardDie').textContent=state.lastRoll!==null?dice[state.lastRoll-1]:'⚄';
 if(state.winner!==null){$('rollDescription').textContent=name(state.winner)+' wins! All six connected.';}
-else if(state.pendingRoll!==null){$('rollDescription').textContent='Result: '+state.pendingRoll+' · drag '+state.pendingRoll+' to GOAL';}
+else if(state.pendingRoll!==null){$('rollDescription').textContent='Result: '+state.pendingRoll+' · drag '+state.pendingRoll+' to the dice';}
 else if(state.lastRoll){$('rollDescription').textContent='Last roll: '+state.lastRoll+' · '+name(state.turn)+' next';}
 else{$('rollDescription').textContent='Roll to connect your number to the centre.';}
 save();
@@ -136,10 +136,10 @@ function snapshot(){return JSON.parse(JSON.stringify({names:state.names,connecte
 let rolling=false;
 function roll(){
 if(state.winner!==null||state.pendingRoll!==null||rolling)return;
-rolling=true;$('roll').disabled=true;$('die').classList.add('rolling');message(name(state.turn)+' is rolling the dice…');
+rolling=true;$('roll').disabled=true;$('diceControl').classList.add('rolling');message(name(state.turn)+' is rolling the dice…');
 let ticks=0;const spin=setInterval(()=>{$('die').textContent=dice[Math.floor(Math.random()*6)];ticks++;},85);
 setTimeout(()=>{
-clearInterval(spin);rolling=false;$('die').classList.remove('rolling');
+clearInterval(spin);rolling=false;$('diceControl').classList.remove('rolling');
 state.history.push(snapshot());state.lastRoll=Math.floor(Math.random()*6)+1;state.pendingRoll=state.lastRoll;
 const duplicate=state.connected[state.turn].includes(state.pendingRoll);
 if(duplicate){message(name(state.turn)+' rolled '+state.pendingRoll+' again — already connected. Turn skipped.','warn');state.pendingRoll=null;state.turn=1-state.turn;}
@@ -179,7 +179,7 @@ $('dragLine').setAttribute('x2',point.x);$('dragLine').setAttribute('y2',point.y
 });
 $('board').addEventListener('pointerup',event=>{
 if(!drag)return;const point=svgPoint(event);
-if(Math.hypot(point.x-180,point.y-150)<=39){finishConnection();}
+if(Math.hypot(point.x-180,point.y-150)<=48){finishConnection();}
 else{drag=null;$('dragLine').style.display='none';message('Drop the number on the centre GOAL to connect it.','warn');}
 });
 $('board').addEventListener('pointercancel',()=>{if(drag){drag=null;$('dragLine').style.display='none';}});
@@ -191,7 +191,7 @@ function newGame(){
 if(!confirm('Start a new game? Current progress will be cleared.'))return;
 const names=[state.names[0],state.names[1]];state=empty();state.names=names;message(name(0)+' starts. Good luck!');render();
 }
-$('roll').addEventListener('click',roll);$('undo').addEventListener('click',undo);$('newGame').addEventListener('click',newGame);
+$('roll').addEventListener('click',roll);$('diceControl').addEventListener('click',()=>{if(state.pendingRoll===null)roll();});$('diceControl').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&state.pendingRoll===null){e.preventDefault();roll();}});$('undo').addEventListener('click',undo);$('newGame').addEventListener('click',newGame);
 
 ['nameA','nameB'].forEach((id,i)=>$(id).addEventListener('change',e=>{state.names[i]=e.target.value.trim()||('Player '+(i+1));render();}));
 try{
