@@ -54,6 +54,13 @@ Each game owns its own local state and key. Canasta has its own state and backup
 - Starting a new game clears progress but keeps current player names; reset names returns both to defaults.
 - Keep player progress as two independent arrays. Never make claimed numbers globally shared.
 
+## Roll & Connect implementation notes
+
+- Keep deterministic rules in `games/roll-connect/game-logic.js`; it is dependency-free and shared by the browser and Node tests.
+- Keep the board in normal HTML/CSS grid rather than layering a 3D cube over SVG coordinates.
+- The die is a visible, accessible button. A rolled target can be connected by dragging it to the die or tapping the highlighted number and then the die.
+- Update the service-worker cache version and precache the logic file whenever game resources change.
+
 ## Safe implementation workflow
 
 1. Read affected source files and current tests before editing.
