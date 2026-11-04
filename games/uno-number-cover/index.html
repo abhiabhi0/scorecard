@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#174e4f"><title>UNO Number Cover — Scorepad</title>
+<style>
+:root{color-scheme:light;--teal:#174e4f;--ink:#20312c;--muted:#66746d;--paper:#fffefa;--line:#dce6df;--red:#df4545;--blue:#3476c8;--green:#36a66b;--yellow:#e5bd36}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:#edf2ed}body{min-height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+header{height:52px;flex:none;background:var(--teal);color:white;display:flex;align-items:center;padding:0 14px}.head{width:min(980px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}.home{color:white;text-decoration:none;border:1px solid #ffffff66;border-radius:9px;padding:6px 10px;font-size:.82rem;font-weight:750}h1{font-size:clamp(1.05rem,3vw,1.45rem);margin:0}
+main{width:min(980px,100%);margin:auto;flex:1;min-height:0;padding:12px 16px 18px;display:flex;flex-direction:column;gap:12px}
+.turnbar{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}.turn-copy strong{display:block}.turn-copy span{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}.turn-pill{border-radius:30px;padding:7px 10px;background:#e8f0eb;color:var(--teal);font-size:.72rem;font-weight:850;white-space:nowrap}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:12px}.player{background:var(--paper);border:3px solid var(--line);border-radius:17px;padding:12px;transition:box-shadow .2s,border-color .2s,background .2s}.player.active{border-color:var(--teal);box-shadow:0 0 0 4px #174e4f25}.player-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.player-name{width:100%;min-width:0;border:0;border-bottom:1px solid transparent;background:transparent;color:var(--ink);font-weight:850;font-size:.95rem;padding:4px 2px;outline:0}.player-name:focus{border-bottom-color:var(--teal)}.count{font-size:.75rem;color:var(--muted);font-weight:850;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.cell{aspect-ratio:1.25;min-width:0;border:2px dashed #cbd6ce;border-radius:11px;background:#f4f6f1;display:grid;place-items:center;position:relative;color:#87948b;font-size:1.4rem;font-weight:900}.cell.covered{border-style:solid;border-color:transparent;background:transparent;padding:0}.cell .uno-card{width:100%;height:100%;min-height:0}.cell .uno-card .card-number{font-size:clamp(1.1rem,3vw,1.7rem)}.cell .target{position:absolute;top:4px;left:6px;font-size:.55rem;color:#78877d;z-index:2}.cell.covered .target{display:none}
+.table{background:linear-gradient(145deg,#1e594d,#103b35);border:6px solid #96734e;border-radius:20px;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) 140px minmax(0,1fr);align-items:center;gap:14px;box-shadow:inset 0 0 0 2px #d8b57a66,inset 0 0 28px #061b1888}.deck-area{display:flex;flex-direction:column;align-items:center;gap:9px}.deck{width:76px;height:108px;border:0;border-radius:12px;background:#d93636;box-shadow:0 5px 0 #a51f29,0 9px 15px #061b1877;position:relative;display:grid;place-items:center;color:#fff}.deck:before{content:"";position:absolute;inset:5px;border:2px solid #fff;border-radius:9px;transform:rotate(-8deg)}.deck:after{content:"UNO";font-size:1.35rem;font-weight:1000;font-style:italic;letter-spacing:-.08em;background:#f8f4e9;color:#e33336;border:3px solid #f8f4e9;border-radius:50%;padding:3px 7px;transform:rotate(-18deg);z-index:1;text-shadow:1px 1px #f4c84b}.deck:disabled{opacity:.5;cursor:not-allowed}.deck-label,.deck-count{color:#f8edcf;text-align:center;font-size:.72rem;font-weight:850}.drawn{min-height:122px;display:flex;align-items:center;justify-content:center}.uno-card{width:76px;height:108px;border:4px solid #fff;border-radius:12px;display:grid;place-items:center;position:relative;box-shadow:0 4px 0 #0003,0 8px 16px #061b1866;overflow:hidden;color:#fff}.uno-card:before{content:"";position:absolute;inset:5px;border:2px solid #ffffffd9;border-radius:50% 42% 50% 42%;transform:rotate(-24deg)}.uno-card.red{background:var(--red)}.uno-card.blue{background:var(--blue)}.uno-card.green{background:var(--green)}.uno-card.yellow{background:var(--yellow);color:#263b33}.card-number{font-size:2rem;font-weight:1000;font-style:italic;text-shadow:1px 2px #0004;z-index:1}.yellow .card-number{text-shadow:1px 1px #fff8}.card-corner{position:absolute;top:3px;left:6px;font-size:.62rem;font-weight:950;z-index:2}.deck-caption{color:#e1eee6;text-align:center;font-size:.68rem;line-height:1.4;max-width:125px}.notice{min-height:22px;text-align:center;color:#315b47;font-size:.82rem;font-weight:750}.notice.warn{color:#805511}.notice.win{color:#17633d}.actions{display:flex;justify-content:center;gap:8px}.action{border:0;border-radius:10px;padding:9px 15px;min-height:40px;background:var(--teal);color:white;font-size:.82rem;font-weight:850}.action.light{background:#e7efe9;color:var(--teal)}.action:disabled{opacity:.42;cursor:not-allowed}
+@media(max-width:650px){header{height:47px}main{padding:8px;gap:9px}.players{gap:7px}.player{padding:8px;border-radius:13px;border-width:2px}.player-head{gap:4px;margin-bottom:7px}.player-name{font-size:.76rem}.count{font-size:.65rem}.grid{gap:5px}.cell{border-radius:8px;font-size:1.1rem}.table{grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);gap:5px;padding:8px;border-width:5px;border-radius:16px}.deck{width:58px;height:84px;border-radius:9px}.deck:before{inset:4px}.deck:after{font-size:1.05rem;padding:2px 5px}.drawn{min-height:95px}.uno-card{width:59px;height:84px;border-width:3px;border-radius:9px}.card-number{font-size:1.55rem}.card-corner{font-size:.52rem;left:4px}.deck-label,.deck-count{font-size:.65rem}.deck-caption{font-size:.6rem;max-width:90px}.action{min-height:37px;padding:8px 12px;font-size:.76rem}}
+@media(max-width:360px){.players{gap:5px}.player{padding:6px}.grid{gap:4px}.table{grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);gap:3px;padding:6px}.deck{width:52px;height:76px}.uno-card{width:53px;height:76px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style></head>
+<body>
+<header><div class="head"><a class="home" href="../../index.html">← Home</a><h1>UNO Number Cover</h1><span>● Auto-save</span></div></header>
+<main>
+<section class="turnbar" aria-live="polite"><div class="turn-copy"><strong id="turnTitle">Player 1's turn</strong><span id="instruction">Draw a card. Cover the matching number on your grid.</span></div><span class="turn-pill" id="turnPill">PLAYER 1</span></section>
+<section class="players" aria-label="Player number grids">
+ <section class="player active" id="player0"><div class="player-head"><input class="player-name" id="name0" maxlength="18" value="Player 1" aria-label="Player 1 name"><span class="count" id="count0">0/9</span></div><div class="grid" id="grid0"></div></section>
+ <section class="player" id="player1"><div class="player-head"><input class="player-name" id="name1" maxlength="18" value="Player 2" aria-label="Player 2 name"><span class="count" id="count1">0/9</span></div><div class="grid" id="grid1"></div></section>
+</section>
+<section class="table" aria-label="UNO deck and drawn card">
+ <div class="deck-area"><button class="deck" id="drawButton" type="button" aria-label="Draw UNO card"></button><div class="deck-label">DRAW CARD</div><div class="deck-count" id="deckCount">72 cards left</div></div>
+ <div class="drawn"><div id="drawnCard" class="deck-caption">Draw a card to begin your turn.</div></div>
+ <div class="deck-area"><div class="deck-caption" id="lastAction">Numbers 1–9 count. Each player has their own grid.</div></div>
+</section>
+<div class="notice" id="notice" role="status" aria-live="polite">Player 1 starts. Draw a card!</div>
+<div class="actions"><button class="action light" id="undo" type="button" disabled>Undo turn</button><button class="action light" id="newGame" type="button">New game</button></div>
+</main>
+<script>
+(()=>{'use strict';
+const KEY='scorepad.unoNumberCover.v1',colors=['red','blue','green','yellow'],names={red:'Red',blue:'Blue',green:'Green',yellow:'Yellow'},$=id=>document.getElementById(id);
+const freshDeck=()=>{const d=[];for(const color of colors)for(let copy=0;copy<2;copy++)for(let n=1;n<=9;n++)d.push({color,n,id:color+'-'+copy+'-'+n});for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}return d;};
+const fresh=()=>({names:['Player 1','Player 2'],turn:0,grids:[[],[]],deck:freshDeck(),lastCard:null,history:[],winner:null});
+let state=fresh();
+function say(t,k=''){const e=$('notice');e.textContent=t;e.className='notice'+(k?' '+k:'');}
+function snapshot(){const s=JSON.parse(JSON.stringify(state));s.history=[];return s;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){say('Unable to save on this device.','warn');}}
+function cardHTML(card){return '<div class="uno-card '+card.color+'" aria-label="'+names[card.color]+' '+card.n+'"><span class="card-corner">'+card.n+'</span><span class="card-number">'+card.n+'</span></div>';}
+function render(){
+ for(let p=0;p<2;p++){
+  $('name'+p).value=state.names[p];$('player'+p).classList.toggle('active',state.winner===null&&state.turn===p);$('count'+p).textContent=state.grids[p].length+'/9';
+  $('grid'+p).innerHTML=Array.from({length:9},(_,i)=>{const n=i+1,c=state.grids[p].find(x=>x.n===n);return '<div class="cell '+(c?'covered':'')+'" aria-label="Number '+n+(c?', covered':'')+'">'+(c?cardHTML(c):'<span class="target">'+n+'</span>'+n)+'</div>';}).join('');
+ }
+ $('turnTitle').textContent=state.winner!==null?state.names[state.winner]+' wins!':state.names[state.turn]+"'s turn";
+ $('turnPill').textContent=state.winner!==null?'WINNER':'PLAYER '+(state.turn+1);
+ $('instruction').textContent=state.winner!==null?'All nine numbers covered. Start a new game.':'Draw a card and cover the matching number on your grid.';
+ $('deckCount').textContent=state.deck.length+' cards left';$('drawButton').disabled=state.winner!==null||state.deck.length===0;
+ $('undo').disabled=!state.history.length;$('drawnCard').innerHTML=state.lastCard?cardHTML(state.lastCard):'Draw a card to begin your turn.';
+ save();
+}
+function draw(){
+ if(state.winner!==null||!state.deck.length)return;
+ state.history.push(snapshot());const p=state.turn,card=state.deck.pop();state.lastCard=card;
+ if(state.grids[p].some(x=>x.n===card.n)){
+  say(state.names[p]+' drew '+card.n+' ('+names[card.color]+'). Already covered — turn passes.','warn');
+ }else{
+  state.grids[p].push(card);
+  if(state.grids[p].length===9){state.winner=p;say(state.names[p]+' wins! All numbers 1–9 are covered.','win');}
+  else say(state.names[p]+' drew '+card.n+' ('+names[card.color]+') and covered '+card.n+'.');
+ }
+ if(state.winner===null)state.turn=1-p;
+ render();
+}
+function valid(s){return s&&Array.isArray(s.names)&&s.names.length===2&&Array.isArray(s.grids)&&s.grids.length===2&&Array.isArray(s.deck)&&s.grids.every(g=>Array.isArray(g)&&g.every(c=>c&&Number.isInteger(c.n)&&c.n>=1&&c.n<=9&&colors.includes(c.color)))&&Number.isInteger(s.turn)&&s.turn>=0&&s.turn<=1;}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(valid(s))state={...fresh(),...s,history:Array.isArray(s.history)?s.history.filter(valid).slice(-50):[]};}catch(_){state=fresh();}}
+$('drawButton').addEventListener('click',draw);
+$('undo').addEventListener('click',()=>{if(!state.history.length)return;const h=state.history.pop();state={...h,history:state.history};say('Last draw undone.');render();});
+$('newGame').addEventListener('click',()=>{if(!confirm('Start a new game? Current progress will be cleared.'))return;const ns=state.names.slice();state=fresh();state.names=ns;say(state.names[0]+' starts. Draw a card!');render();});
+[0,1].forEach(p=>$('name'+p).addEventListener('change',e=>{state.names[p]=e.target.value.trim()||'Player '+(p+1);render();}));
+load();render();
+})();
+</script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')window.addEventListener('load',()=>navigator.serviceWorker.register('../../sw.js').catch(()=>{}));</script>
+</body></html>
