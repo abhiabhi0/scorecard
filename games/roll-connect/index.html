@@ -34,7 +34,7 @@ main{width:min(1080px,100%);margin:auto;flex:1;min-height:0;padding:12px 16px 16
 <script src="game-logic.js"></script>
 <script>
 (()=>{'use strict';
-const R=window.RollConnectRules,KEY='scorepad.rollConnect.v1',$=id=>document.getElementById(id),;
+const R=window.RollConnectRules,KEY='scorepad.rollConnect.v1' ,$=id=>document.getElementById(id);
 let state=R.freshState(),rolling=false,selected=null,dragging=null;
 function say(t,k=''){const e=$('notice');e.textContent=t;e.className='notice'+(k?' '+k:'');}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){say('Unable to save on this device.','warn');}}
