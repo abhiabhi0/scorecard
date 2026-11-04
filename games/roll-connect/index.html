@@ -45,7 +45,7 @@ function render(){
  }
  $('turnTitle').textContent=state.winner!==null?state.names[state.winner]+' wins!':state.names[state.turn]+"'s turn";$('turnPill').textContent=state.winner!==null?'WINNER':'PLAYER '+(state.turn+1);
  $('instruction').textContent=state.winner!==null?'All six numbers connected. Start a new game.':state.pendingRoll!==null?'Connect '+state.pendingRoll+' to the centre dice.':'Roll the dice to get your number.';
- $('die').className='die face-'+(state.lastRoll||5);$('diceButton').disabled=rolling||state.winner!==null||state.pendingRoll!==null;$('diceButton').classList.toggle('rolling',rolling);
+ $('die').className='die face-'+(state.lastRoll||5);$('diceButton').disabled=rolling||state.winner!==null||(state.pendingRoll!==null&&!selected);$('diceButton').classList.toggle('rolling',rolling);
  $('diceButton').setAttribute('aria-label',state.pendingRoll!==null?'Connect number '+state.pendingRoll:'Roll dice for '+state.names[state.turn]);$('undo').disabled=rolling||!state.history.length;$('newGame').disabled=rolling;
  $('diceHelp').textContent=state.pendingRoll!==null?'Drag '+state.pendingRoll+' here, or tap the highlighted number then tap the dice.':'Each player connects their own numbers 1–6.';save();
 }
@@ -62,7 +62,7 @@ function connect(p,n){
 }
 function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return;const parsed=JSON.parse(raw);if(R.validState(parsed))state={...R.freshState(),...parsed,history:Array.isArray(parsed.history)?parsed.history:[]};}catch(_){state=R.freshState();}}
 $('diceButton').addEventListener('click',()=>{if(state.pendingRoll===null)roll();else if(selected)connect(selected.player,selected.number);});
-document.addEventListener('click',e=>{const b=e.target.closest('.number');if(!b||rolling)return;const p=Number(b.dataset.player),n=Number(b.dataset.number);if(state.pendingRoll===n&&state.turn===p){selected={player:p,number:n};say('Now tap the centre dice to connect '+n+'.');}});
+document.addEventListener('click',e=>{const b=e.target.closest('.number');if(!b||rolling)return;const p=Number(b.dataset.player),n=Number(b.dataset.number);if(state.pendingRoll===n&&state.turn===p){selected={player:p,number:n};$('diceButton').disabled=false;say('Now tap the centre dice to connect '+n+'.');}});
 document.addEventListener('pointerdown',e=>{const b=e.target.closest('.number.highlight');if(b&&!rolling)dragging={player:Number(b.dataset.player),number:Number(b.dataset.number)};});
 document.addEventListener('pointerup',e=>{if(!dragging)return;const r=$('diceButton').getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom,d=dragging;dragging=null;if(inside)connect(d.player,d.number);});
 document.addEventListener('pointercancel',()=>{dragging=null;});
