@@ -121,7 +121,7 @@ $('statA').textContent=state.connected[0].length+'/6';$('statB').textContent=sta
 $('turnName').textContent=state.winner!==null?name(state.winner)+' wins!':name(state.turn)+"'s turn";
 $('rollDescription').textContent=state.winner!==null?'Game complete — start a new game.':'Roll to connect your number to the centre.';
 
-$('roll').disabled=state.winner!==null;$('pass').disabled=state.winner!==null;$('undo').disabled=state.history.length===0;
+$('roll').disabled=state.winner!==null;$('undo').disabled=state.history.length===0;
 $('roll').textContent=state.winner!==null?'Finished':'🎲 Roll';
 if(state.lastRoll!==null){$('die').textContent=dice[state.lastRoll-1];}else{$('die').textContent='⚄';}
 if(state.winner!==null){$('rollTitle').textContent='Game complete';$('rollDescription').textContent=name(state.winner)+' connected all six numbers.';}
