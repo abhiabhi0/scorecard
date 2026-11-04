@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scorepad-static-v5';
+const CACHE_NAME = 'scorepad-static-v6';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,9 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './games/canasta/',
-  './games/canasta/index.html'
+  './games/canasta/index.html',
+  './games/roll-connect/',
+  './games/roll-connect/index.html'
 ];
 
 self.addEventListener('install', event => {
