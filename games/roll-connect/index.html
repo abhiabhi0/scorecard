@@ -60,7 +60,7 @@ function connect(p,n){
  if(rolling||state.pendingRoll===null)return;const r=R.connect(state,p,n);if(r.event==='invalid'){say('Connect only the highlighted number for the current player.','warn');return;}if(r.event==='blocked')return;
  state=r.state;selected=null;if(r.event==='won')say(state.names[p]+' wins! All six connected.','win');else say(state.names[p]+' connected '+n+'. '+state.names[state.turn]+' is next.');render();
 }
-function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return;const parsed=JSON.parse(raw);if(R.validState(parsed))state={...R.freshState(),...parsed,history:Array.isArray(parsed.history)?parsed.history:[]};}catch(_){state=R.freshState();}}
+function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return;const parsed=JSON.parse(raw);if(R.validState(parsed))state={...R.freshState(),...parsed,history:Array.isArray(parsed.history)?parsed.history.filter(R.validState).map(h=>({...h,history:[]})):[]};}catch(_){state=R.freshState();}}
 $('diceButton').addEventListener('click',()=>{if(state.pendingRoll===null)roll();else if(selected)connect(selected.player,selected.number);});
 document.addEventListener('click',e=>{const b=e.target.closest('.number');if(!b||rolling)return;const p=Number(b.dataset.player),n=Number(b.dataset.number);if(state.pendingRoll===n&&state.turn===p){selected={player:p,number:n};$('diceButton').disabled=false;say('Now tap the centre dice to connect '+n+'.');}});
 document.addEventListener('pointerdown',e=>{const b=e.target.closest('.number.highlight');if(b&&!rolling)dragging={player:Number(b.dataset.player),number:Number(b.dataset.number)};});
