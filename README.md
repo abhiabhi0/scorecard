@@ -6,7 +6,8 @@ A mobile-friendly, static website for game-night scorekeeping and offline tablet
 
 - `index.html` — game-selection homepage and PWA install prompt.
 - `games/canasta/index.html` — self-contained Canasta scorekeeper, including scoring, round history, editing, and backup/restore.
-- `games/roll-connect/index.html` — self-contained two-player dice game.
+- `games/roll-connect/index.html` — two-player dice game UI.
+- `games/roll-connect/game-logic.js` — dependency-free game rules shared by browser and tests.
 - `manifest.webmanifest` — installable PWA metadata and app scope.
 - `sw.js` — service worker; app-shell precache and offline navigation fallback.
 - `icons/` — app icons.
