@@ -124,8 +124,9 @@ $('rollDescription').textContent=state.winner!==null?'Game complete — start a 
 $('roll').disabled=state.winner!==null;$('undo').disabled=state.history.length===0;
 $('roll').textContent=state.winner!==null?'Finished':'🎲 Roll';
 if(state.lastRoll!==null){$('die').textContent=dice[state.lastRoll-1];}else{$('die').textContent='⚄';}
-if(state.winner!==null){$('rollTitle').textContent='Game complete';$('rollDescription').textContent=name(state.winner)+' connected all six numbers.';}
-else{$('rollTitle').textContent=state.lastRoll?'Last roll: '+state.lastRoll:'Ready to roll?';$('rollDescription').textContent='Take turns. Each player has their own 1–6.';}
+if(state.winner!==null){$('rollDescription').textContent=name(state.winner)+' wins! All six connected.';}
+else if(state.lastRoll){$('rollDescription').textContent='Last roll: '+state.lastRoll+' · '+name(state.turn)+' next';}
+else{$('rollDescription').textContent='Roll to connect your number to the centre.';}
 save();
 }
 function message(text,kind=''){const el=$('message');el.textContent=text;el.className='message'+(kind?' '+kind:'');}
