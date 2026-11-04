@@ -39,3 +39,10 @@ test('game page has a visible die and offline logic dependency',()=>{
  assert.match(page,/id="diceButton"/);assert.match(page,/id="player0"/);assert.match(page,/id="player1"/);assert.match(page,/game-logic\.js/);
  assert.match(sw,/games\/roll-connect\/game-logic\.js/);
 });
+
+test('touch dragging uses pointer capture and visible drop feedback',()=>{
+ assert.match(page,/touch-action:none/);
+ assert.match(page,/setPointerCapture/);
+ assert.match(page,/pointermove/);
+ assert.match(page,/drop-hover/);
+});
