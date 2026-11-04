@@ -45,7 +45,7 @@ function render(){
  }
  $('turnTitle').textContent=state.winner!==null?state.names[state.winner]+' wins!':state.names[state.turn]+"'s turn";$('turnPill').textContent=state.winner!==null?'WINNER':'PLAYER '+(state.turn+1);
  $('instruction').textContent=state.winner!==null?'All six numbers connected. Start a new game.':state.pendingRoll!==null?'Connect '+state.pendingRoll+' to the centre dice.':'Roll the dice to get your number.';
- $('die').className='die face-'+(state.lastRoll||5);$('diceButton').disabled=rolling||state.winner!==null||(state.pendingRoll!==null&&!selected);$('diceButton').classList.toggle('rolling',rolling);
+ $('die').className='die face-'+(state.lastRoll||5);$('diceButton').disabled=rolling||state.winner!==null;$('diceButton').classList.toggle('rolling',rolling);
  $('diceButton').setAttribute('aria-label',state.pendingRoll!==null?'Connect number '+state.pendingRoll:'Roll dice for '+state.names[state.turn]);$('undo').disabled=rolling||!state.history.length;$('newGame').disabled=rolling;
  $('diceHelp').textContent=state.pendingRoll!==null?'Drag '+state.pendingRoll+' here, or tap the highlighted number then tap the dice.':'Each player connects their own numbers 1–6.';save();
 }
