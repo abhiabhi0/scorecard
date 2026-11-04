@@ -90,7 +90,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('pointerdown',e=>{
  const card=e.target.closest('[data-drawn-card]');if(!card||!state.pendingCard)return;
- e.preventDefault();drag={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false,element:card};
+ drag={pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,moved:false,element:card};
  try{card.setPointerCapture(e.pointerId);}catch(_){}card.classList.add('dragging');
 });
 document.addEventListener('pointermove',e=>{
