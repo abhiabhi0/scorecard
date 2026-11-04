@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scorepad-static-v6';
+const CACHE_NAME = 'scorepad-static-v7';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,7 +9,8 @@ const APP_SHELL = [
   './games/canasta/',
   './games/canasta/index.html',
   './games/roll-connect/',
-  './games/roll-connect/index.html'
+  './games/roll-connect/index.html',
+  './games/roll-connect/game-logic.js'
 ];
 
 self.addEventListener('install', event => {
