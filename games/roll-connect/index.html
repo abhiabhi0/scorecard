@@ -145,7 +145,7 @@ const duplicate=state.connected[state.turn].includes(state.pendingRoll);
 if(duplicate){message(name(state.turn)+' rolled '+state.pendingRoll+' again — already connected. Turn skipped.','warn');state.pendingRoll=null;state.turn=1-state.turn;}
 else{message(name(state.turn)+' rolled '+state.pendingRoll+'. Drag it to the centre dice.');}
 render();
-},850);
+},1200);
 }
 function svgPoint(event){
 const svg=$('board'),point=svg.createSVGPoint();point.x=event.clientX;point.y=event.clientY;
