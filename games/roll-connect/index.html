@@ -15,7 +15,7 @@ header{flex:0 0 54px;background:var(--bg);color:#fff;padding:6px 14px;box-shadow
 .home{color:#fff;text-decoration:none;border:1px solid #ffffff55;padding:6px 10px;border-radius:9px;font-weight:750;font-size:.82rem;white-space:nowrap}
 h1{font-size:clamp(1.15rem,3vw,1.65rem);margin:0;letter-spacing:-.04em}
 .offline{font-size:.65rem;font-weight:800;border:1px solid #ffffff55;border-radius:30px;padding:6px 9px;white-space:nowrap}
-main{width:min(100%,1100px);height:calc(100dvh - 54px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:0;margin:0 auto;padding:10px 14px 12px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:9px}
+main{width:min(100%,1180px);height:calc(100dvh - 54px - env(safe-area-inset-top) - env(safe-area-inset-bottom));min-height:0;margin:0 auto;padding:12px 18px 16px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px}
 .setup{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px}
 .player{display:flex;align-items:center;gap:8px;min-width:0;padding:7px 10px;background:var(--paper);border-radius:12px;border:2px solid var(--line);transition:border-color .2s}.player.active.a{border-color:var(--a);animation:turn-a 1s ease-in-out infinite}.player.active.b{border-color:var(--b);animation:turn-b 1s ease-in-out infinite}@keyframes turn-a{50%{box-shadow:0 0 0 4px #8f3d5f30}}@keyframes turn-b{50%{box-shadow:0 0 0 4px #9a6a1730}}
 .player.b{flex-direction:row-reverse;text-align:right}
@@ -23,14 +23,14 @@ main{width:min(100%,1100px);height:calc(100dvh - 54px - env(safe-area-inset-top)
 .player input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--ink);font-weight:850;font-size:clamp(.78rem,2.2vw,1rem);padding:3px}
 .progress{font-size:.72rem;color:var(--muted);font-weight:750;white-space:nowrap}
 .vs{font-size:.68rem;color:var(--muted);font-weight:900}
-.game-area{min-height:0;display:flex;align-items:center;justify-content:center;background:var(--paper);border-radius:18px;border:1px solid var(--line);box-shadow:0 7px 20px #103b3c0c;overflow:hidden;padding:5px}
-.board-wrap{width:100%;height:100%;min-height:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at center,#f6f2e7 0,#fffefa 70%);border-radius:13px}
+.game-area{min-height:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#214f45,#102f2b);border-radius:25px;border:7px solid #8b6743;box-shadow:inset 0 0 0 2px #c29a6655,inset 0 0 38px #061d1a99,0 14px 35px #0d292633;overflow:hidden;padding:9px}
+.board-wrap{position:relative;width:100%;height:100%;min-height:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 48%,#286354 0%,#1b5147 58%,#123c36 100%);border-radius:15px;box-shadow:inset 0 0 50px #071f1b88,inset 0 0 0 1px #ffffff14;overflow:hidden}.board-wrap:before{content:"";position:absolute;inset:12px;border:1px solid #d7c59b44;border-radius:10px;pointer-events:none}.board-wrap:after{content:"ROLL  •  CONNECT  •  WIN";position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.28em;font-weight:900;color:#e9d9b477;pointer-events:none;white-space:nowrap}
 svg{display:block;width:100%;height:100%;max-width:900px;touch-action:manipulation}
-.player-label{font-size:12px;font-weight:850;fill:var(--ink)}.node-text{font-size:15px;font-weight:900;fill:#26352f;dominant-baseline:middle;text-anchor:middle}
-.node{fill:#fff;stroke-width:2.5}.node-hit{cursor:grab;touch-action:none}.node-hit:active{cursor:grabbing}.node-hit.target .node{stroke:var(--gold);stroke-width:4;filter:drop-shadow(0 0 4px #e6b75a88);animation:target-pulse .8s ease-in-out infinite}.node-hit.target.a .node{stroke:var(--a)}.node-hit.target.b .node{stroke:var(--b)}@keyframes target-pulse{50%{stroke-width:7;filter:drop-shadow(0 0 7px currentColor)}}.drag-line{stroke:var(--gold);stroke-width:4;stroke-dasharray:7 5;stroke-linecap:round;pointer-events:none}.node.done.a{fill:#f8e8ef;stroke:var(--a)}.node.done.b{fill:#fbf0d9;stroke:var(--b)}
-.connection{fill:none;stroke-width:4;stroke-linecap:round;opacity:.85}.connection.a{stroke:var(--a)}.connection.b{stroke:var(--b)}
-.die-face{fill:#fff;stroke:#aab8ae;stroke-width:3;cursor:pointer;filter:drop-shadow(0 5px 3px #173c3330)}.die-glyph{font-size:48px;text-anchor:middle;dominant-baseline:middle;pointer-events:none;fill:#174e4f}.dice-control{cursor:pointer;touch-action:manipulation}.dice-control.active-a .die-face{stroke:var(--a);stroke-width:5;animation:dice-glow-a .9s ease-in-out infinite}.dice-control.active-b .die-face{stroke:var(--b);stroke-width:5;animation:dice-glow-b .9s ease-in-out infinite}.dice-control.rolling .die-face{animation:dice-tumble .18s linear infinite}.dice-control:focus{outline:none}.dice-control:focus .die-face{stroke:var(--gold);stroke-width:6}@keyframes dice-glow-a{50%{filter:drop-shadow(0 0 9px #8f3d5f)}}@keyframes dice-glow-b{50%{filter:drop-shadow(0 0 9px #9a6a17)}}
-.bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.player-label{font-size:11px;font-weight:900;letter-spacing:1px;fill:#f5e8c8}.node-text{font-size:15px;font-weight:950;fill:#26352f;dominant-baseline:middle;text-anchor:middle}
+.node{fill:#fffaf0;stroke-width:3;filter:drop-shadow(0 3px 2px #071d1a88)}.node-hit{cursor:grab;touch-action:none}.node-hit:active{cursor:grabbing}.node-hit.target .node{stroke:var(--gold);stroke-width:4;filter:drop-shadow(0 0 4px #e6b75a88);animation:target-pulse .8s ease-in-out infinite}.node-hit.target.a .node{stroke:var(--a)}.node-hit.target.b .node{stroke:var(--b)}@keyframes target-pulse{50%{stroke-width:7;filter:drop-shadow(0 0 7px currentColor)}}.drag-line{stroke:var(--gold);stroke-width:4;stroke-dasharray:7 5;stroke-linecap:round;pointer-events:none}.node.done.a{fill:#f8e8ef;stroke:var(--a)}.node.done.b{fill:#fbf0d9;stroke:var(--b)}
+.connection{fill:none;stroke-width:5;stroke-linecap:round;opacity:.96;filter:drop-shadow(0 2px 2px #071d1a88)}.connection.a{stroke:var(--a)}.connection.b{stroke:var(--b)}
+.dice-button{position:absolute;z-index:4;left:50%;top:50%;width:106px;height:106px;transform:translate(-50%,-50%);display:grid;place-items:center;border:0;border-radius:50%;background:radial-gradient(circle,#ffffff22 0 45%,#071f1c22 70%);box-shadow:0 0 0 1px #ffffff18,0 0 32px #061c1a55;perspective:700px;touch-action:manipulation}.dice-button:focus-visible{outline:3px solid var(--gold);outline-offset:7px}.dice-button.active-a{box-shadow:0 0 0 2px #8f3d5f,0 0 0 9px #8f3d5f22,0 0 38px #d65d8a77;animation:turn-glow-a 1s ease-in-out infinite}.dice-button.active-b{box-shadow:0 0 0 2px #e2b34d,0 0 0 9px #e2b34d22,0 0 38px #e2b34d77;animation:turn-glow-b 1s ease-in-out infinite}@keyframes turn-glow-a{50%{box-shadow:0 0 0 4px #8f3d5f,0 0 0 14px #8f3d5f20,0 0 48px #d65d8a99}}@keyframes turn-glow-b{50%{box-shadow:0 0 0 4px #e2b34d,0 0 0 14px #e2b34d20,0 0 48px #e2b34d99}}.dice-cube{--size:66px;position:relative;width:var(--size);height:var(--size);transform-style:preserve-3d;transform:rotateX(-18deg) rotateY(-28deg);transition:transform .7s cubic-bezier(.2,.85,.2,1);filter:drop-shadow(0 13px 7px #061a17aa)}.dice-cube .face{position:absolute;inset:0;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);gap:4px;padding:10px;border-radius:12px;background:linear-gradient(145deg,#fff 0%,#f4f0e6 100%);border:1px solid #d6d1c4;box-shadow:inset 0 2px 4px #fff, inset 0 -4px 7px #b9b4a766;backface-visibility:hidden}.dice-cube .face span{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#56645e,#172521 75%);opacity:0;box-shadow:inset 0 1px 2px #0008}.face.front{transform:translateZ(calc(var(--size)/2))}.face.back{transform:rotateY(180deg) translateZ(calc(var(--size)/2))}.face.right{transform:rotateY(90deg) translateZ(calc(var(--size)/2))}.face.left{transform:rotateY(-90deg) translateZ(calc(var(--size)/2))}.face.top{transform:rotateX(90deg) translateZ(calc(var(--size)/2))}.face.bottom{transform:rotateX(-90deg) translateZ(calc(var(--size)/2))}.face.one span:nth-child(5),.face.two span:nth-child(1),.face.two span:nth-child(9),.face.three span:nth-child(1),.face.three span:nth-child(5),.face.three span:nth-child(9),.face.four span:nth-child(1),.face.four span:nth-child(3),.face.four span:nth-child(7),.face.four span:nth-child(9),.face.five span:nth-child(1),.face.five span:nth-child(3),.face.five span:nth-child(5),.face.five span:nth-child(7),.face.five span:nth-child(9),.face.six span:nth-child(1),.face.six span:nth-child(3),.face.six span:nth-child(4),.face.six span:nth-child(6),.face.six span:nth-child(7),.face.six span:nth-child(9){opacity:1}.dice-cube.show-1{transform:rotateX(0deg) rotateY(0deg)}.dice-cube.show-2{transform:rotateX(-90deg) rotateY(0deg)}.dice-cube.show-3{transform:rotateX(0deg) rotateY(-90deg)}.dice-cube.show-4{transform:rotateX(0deg) rotateY(90deg)}.dice-cube.show-5{transform:rotateX(90deg) rotateY(0deg)}.dice-cube.show-6{transform:rotateX(0deg) rotateY(180deg)}.dice-cube.rolling{animation:cube-roll 1.15s cubic-bezier(.2,.65,.25,1) both}@keyframes cube-roll{0%{transform:translateY(0) rotateX(-18deg) rotateY(-28deg) rotateZ(0)}15%{transform:translateY(-26px) rotateX(150deg) rotateY(130deg) rotateZ(45deg)}32%{transform:translateY(-5px) rotateX(320deg) rotateY(290deg) rotateZ(110deg)}48%{transform:translateY(-34px) rotateX(510deg) rotateY(470deg) rotateZ(185deg)}66%{transform:translateY(-9px) rotateX(700deg) rotateY(660deg) rotateZ(255deg)}82%{transform:translateY(-18px) rotateX(850deg) rotateY(790deg) rotateZ(330deg)}100%{transform:translateY(0) rotateX(1080deg) rotateY(990deg) rotateZ(405deg)}}.dice-button.rolling{animation:none}.dice-button.active-a .dice-cube:not(.rolling),.dice-button.active-b .dice-cube:not(.rolling){filter:drop-shadow(0 10px 9px #061a17aa)}
+.bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}.status{background:linear-gradient(135deg,#fffefa,#f2f0e6);box-shadow:0 5px 15px #102f2b18}.status-copy strong{font-size:1rem}.controls .btn{box-shadow:0 3px 0 #0c302d33}.controls .btn:first-child{display:none}
 .status{min-width:0;display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:8px 12px}
 .die{width:76px;height:76px;flex:0 0 76px;border-radius:17px;background:linear-gradient(145deg,#fff 0%,#f1f3ef 100%);border:2px solid #d7dfd8;display:grid;place-items:center;font-size:4.25rem;line-height:1;box-shadow:0 7px 0 #cbd5cd,0 10px 18px #173c3326;transform-origin:center;perspective:500px;user-select:none}.die.rolling{animation:dice-tumble .18s linear infinite}@keyframes dice-tumble{0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}25%{transform:rotateX(95deg) rotateY(110deg) rotateZ(35deg) scale(1.08)}50%{transform:rotateX(190deg) rotateY(205deg) rotateZ(75deg) scale(.96)}75%{transform:rotateX(285deg) rotateY(300deg) rotateZ(115deg) scale(1.08)}100%{transform:rotateX(360deg) rotateY(405deg) rotateZ(155deg) scale(1)}}
 .status-copy{min-width:0}.status-copy strong{display:block;font-size:clamp(.78rem,2.2vw,1rem);line-height:1.2}.status-copy span{display:block;font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
@@ -45,13 +45,13 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 header{flex-basis:48px;padding:5px 9px}.offline{display:none}
 main{height:calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:7px;gap:7px}
 .setup{gap:5px}.player{padding:6px 7px;gap:5px}.player-mark{height:25px;width:7px;flex-basis:7px}.progress{font-size:.65rem}.vs{font-size:.6rem}
-.game-area{border-radius:14px;padding:3px}.board-wrap{border-radius:10px}
+.game-area{border-radius:18px;padding:5px}.board-wrap{border-radius:12px}.dice-cube{--size:58px}.dice-button{width:94px;height:94px}
 .bottom{grid-template-columns:1fr;gap:6px}.status{padding:6px 9px;gap:8px}.die{width:62px;height:62px;flex-basis:62px;font-size:3.45rem}
 .status-copy span{font-size:.68rem}.message{font-size:.66rem}
 .controls{display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1fr;gap:6px}.btn{min-height:38px;padding:8px 7px;font-size:.74rem}
 }
 @media(max-height:620px) and (min-width:601px){
-header{flex-basis:44px}main{height:calc(100dvh - 44px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:5px 10px;gap:5px}
+header{flex-basis:44px}main{height:calc(100dvh - 44px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding:5px 10px;gap:5px}.dice-cube{--size:48px}.dice-button{width:78px;height:78px}
 .player{padding:4px 8px}.status{padding:5px 9px}.die{width:36px;height:36px;flex-basis:36px}.btn{min-height:36px;padding:7px 10px}
 }
 @media(orientation:landscape) and (max-height:500px){
@@ -76,9 +76,10 @@ header{flex-basis:40px}main{height:calc(100dvh - 40px - env(safe-area-inset-top)
 <text x="70" y="17" text-anchor="middle" class="player-label" id="labelA">PLAYER 1</text>
 <text x="290" y="286" text-anchor="middle" class="player-label" id="labelB">PLAYER 2</text>
 <g id="linesA"></g><g id="linesB"></g><line id="dragLine" class="drag-line" x1="0" y1="0" x2="0" y2="0" style="display:none"></line>
-<g id="diceControl" class="dice-control" role="button" tabindex="0" aria-label="Roll dice"><rect class="die-face" x="145" y="115" width="70" height="70" rx="15"></rect><text id="boardDie" class="die-glyph" x="180" y="151">⚄</text></g>
+
 <g id="nodesA"></g><g id="nodesB"></g>
 </svg>
+<button id="diceControl" class="dice-button" type="button" aria-label="Roll dice"><span id="diceCube" class="dice-cube show-5"><span class="face front one"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="face back six"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="face right three"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="face left four"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="face top two"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><span class="face bottom five"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></span></button>
 </div>
 </section>
 <div class="bottom">
@@ -111,6 +112,7 @@ $(target).innerHTML=positions.map(p=>'<g class="node-hit '+(state.pendingRoll===
 function makeLines(target,positions,player){
 $(target).innerHTML=state.connected[player].map(n=>{const p=positions.find(v=>v.n===n);return '<line class="connection '+(player===0?'a':'b')+'" x1="'+p.x+'" y1="'+p.y+'" x2="180" y2="150"></line>';}).join('');
 }
+function setDiceFace(value){const cube=$('diceCube');cube.classList.remove('show-1','show-2','show-3','show-4','show-5','show-6');if(value)cube.classList.add('show-'+value);}
 function render(){
 $('nameA').value=state.names[0];$('nameB').value=state.names[1];
 $('labelA').textContent=name(0).toUpperCase();$('labelB').textContent=name(1).toUpperCase();$('nameA').parentElement.classList.toggle('active',state.winner===null&&state.turn===0);$('nameB').parentElement.classList.toggle('active',state.winner===null&&state.turn===1);
@@ -121,10 +123,10 @@ $('rollDescription').textContent=state.winner!==null?'Game complete — start a 
 
 $('roll').disabled=state.winner!==null||state.pendingRoll!==null||rolling;
 $('roll').hidden=true;
-$('diceControl').classList.toggle('active-a',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===0);$('diceControl').classList.toggle('active-b',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===1);$('diceControl').classList.toggle('rolling',rolling);$('diceControl').setAttribute('aria-label',state.pendingRoll!==null?'Drag '+state.pendingRoll+' to the dice':'Roll dice for '+name(state.turn));
+$('diceControl').classList.toggle('active-a',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===0);$('diceControl').classList.toggle('active-b',state.winner===null&&state.pendingRoll===null&&!rolling&&state.turn===1);$('diceControl').classList.toggle('rolling',rolling);$('diceControl').disabled=state.winner!==null||state.pendingRoll!==null||rolling;$('diceControl').setAttribute('aria-label',state.pendingRoll!==null?'Drag '+state.pendingRoll+' to the dice':'Roll dice for '+name(state.turn));setDiceFace(state.lastRoll||5);
 $('undo').disabled=state.history.length===0||rolling;$('newGame').disabled=rolling;
 $('roll').textContent=state.winner!==null?'Finished':'🎲 Roll';
-$('boardDie').textContent=state.lastRoll!==null?dice[state.lastRoll-1]:'⚄';
+
 if(state.winner!==null){$('rollDescription').textContent=name(state.winner)+' wins! All six connected.';}
 else if(state.pendingRoll!==null){$('rollDescription').textContent='Result: '+state.pendingRoll+' · drag '+state.pendingRoll+' to the dice';}
 else if(state.lastRoll){$('rollDescription').textContent='Last roll: '+state.lastRoll+' · '+name(state.turn)+' next';}
@@ -136,14 +138,12 @@ function snapshot(){return JSON.parse(JSON.stringify({names:state.names,connecte
 let rolling=false;
 function roll(){
 if(state.winner!==null||state.pendingRoll!==null||rolling)return;
-rolling=true;$('roll').disabled=true;$('diceControl').classList.add('rolling');message(name(state.turn)+' is rolling the dice…');
-let ticks=0;const spin=setInterval(()=>{$('boardDie').textContent=dice[Math.floor(Math.random()*6)];ticks++;},85);
+rolling=true;$('roll').disabled=true;$('diceControl').disabled=true;$('diceCube').classList.remove('show-1','show-2','show-3','show-4','show-5','show-6');$('diceCube').classList.add('rolling');message(name(state.turn)+' is rolling the dice…');
 setTimeout(()=>{
-clearInterval(spin);rolling=false;$('diceControl').classList.remove('rolling');
-state.history.push(snapshot());state.lastRoll=Math.floor(Math.random()*6)+1;state.pendingRoll=state.lastRoll;
+rolling=false;const cube=$('diceCube');cube.classList.remove('rolling');state.history.push(snapshot());state.lastRoll=Math.floor(Math.random()*6)+1;setDiceFace(state.lastRoll);state.pendingRoll=state.lastRoll;
 const duplicate=state.connected[state.turn].includes(state.pendingRoll);
 if(duplicate){message(name(state.turn)+' rolled '+state.pendingRoll+' again — already connected. Turn skipped.','warn');state.pendingRoll=null;state.turn=1-state.turn;}
-else{message(name(state.turn)+' rolled '+state.pendingRoll+'. Drag it to the GOAL.');}
+else{message(name(state.turn)+' rolled '+state.pendingRoll+'. Drag it to the centre dice.');}
 render();
 },850);
 }
@@ -171,7 +171,7 @@ drag={player,number,x:p.x,y:p.y};
 const line=$('dragLine');line.setAttribute('x1',p.x);line.setAttribute('y1',p.y);
 const point=svgPoint(event);line.setAttribute('x2',point.x);line.setAttribute('y2',point.y);line.style.display='block';
 $('board').setPointerCapture(event.pointerId);
-message('Drag the number into the centre GOAL.');
+message('Drag the highlighted number onto the dice.');
 });
 $('board').addEventListener('pointermove',event=>{
 if(!drag)return;const point=svgPoint(event);
@@ -179,8 +179,8 @@ $('dragLine').setAttribute('x2',point.x);$('dragLine').setAttribute('y2',point.y
 });
 $('board').addEventListener('pointerup',event=>{
 if(!drag)return;const point=svgPoint(event);
-if(Math.hypot(point.x-180,point.y-150)<=48){finishConnection();}
-else{drag=null;$('dragLine').style.display='none';message('Drop the number on the centre GOAL to connect it.','warn');}
+if(Math.hypot(point.x-180,point.y-150)<=54){finishConnection();}
+else{drag=null;$('dragLine').style.display='none';message('Drop the number on the centre dice to connect it.','warn');}
 });
 $('board').addEventListener('pointercancel',()=>{if(drag){drag=null;$('dragLine').style.display='none';}});
 function undo(){
