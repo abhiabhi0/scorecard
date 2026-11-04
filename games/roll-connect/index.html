@@ -137,7 +137,7 @@ let rolling=false;
 function roll(){
 if(state.winner!==null||state.pendingRoll!==null||rolling)return;
 rolling=true;$('roll').disabled=true;$('diceControl').classList.add('rolling');message(name(state.turn)+' is rolling the dice…');
-let ticks=0;const spin=setInterval(()=>{$('die').textContent=dice[Math.floor(Math.random()*6)];ticks++;},85);
+let ticks=0;const spin=setInterval(()=>{$('boardDie').textContent=dice[Math.floor(Math.random()*6)];ticks++;},85);
 setTimeout(()=>{
 clearInterval(spin);rolling=false;$('diceControl').classList.remove('rolling');
 state.history.push(snapshot());state.lastRoll=Math.floor(Math.random()*6)+1;state.pendingRoll=state.lastRoll;
