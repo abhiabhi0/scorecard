@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#174e4f">
+<meta name="description" content="Roll & Connect — a two-player dice race. Works offline.">
+<title>Roll &amp; Connect — Scorepad</title>
+<style>
+:root{--bg:#174e4f;--dark:#103b3c;--ink:#202d2a;--muted:#58645e;--paper:#fffefa;--line:#dfe8e2;--gold:#e6b75a;--a:#8f3d5f;--b:#9a6a17;--shadow:0 9px 28px rgba(16,59,60,.10}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#edf2ed;color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+button,input{font:inherit}button{-webkit-tap-highlight-color:transparent;cursor:pointer}
+header{background:var(--bg);color:#fff;padding:max(12px,env(safe-area-inset-top)) 14px 18px;box-shadow:0 4px 14px #103b3c22}
+.head{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.home{color:#fff;text-decoration:none;border:1px solid #ffffff55;padding:8px 11px;border-radius:10px;font-weight:750;font-size:.85rem}
+h1{font-size:clamp(1.3rem,5vw,1.9rem);margin:0;letter-spacing:-.04em}
+.offline{font-size:.68rem;font-weight:800;border:1px solid #ffffff55;border-radius:30px;padding:7px 9px;white-space:nowrap}
+main{max-width:900px;margin:18px auto;padding:0 12px}
+.panel{background:var(--paper);border-radius:20px;padding:clamp(14px,3vw,24px);margin-bottom:14px;box-shadow:var(--shadow)}
+.intro h2{margin:0 0 5px;font-size:1.2rem}.intro p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.5}
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+label{display:block;font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:5px}
+input{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;background:#fff;color:var(--ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:850;background:var(--bg);color:#fff;min-height:44px}
+.btn.secondary{background:#eaf1ec;color:var(--bg)}.btn.warn{background:#fff1e8;color:#8b4e1b}
+.turn{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.turn strong{font-size:1rem}.turn small{color:var(--muted)}
+.board-wrap{border:1px solid var(--line);border-radius:16px;background:radial-gradient(circle at center,#f6f2e7 0,#fffefa 66%);overflow:hidden}
+svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.player-label{font-size:13px;font-weight:850;fill:var(--ink)}.node-text{font-size:16px;font-weight:900;fill:#26352f;dominant-baseline:middle;text-anchor:middle}
+.node{fill:#fff;stroke-width:2.5}.node.done.a{fill:#f8e8ef;stroke:var(--a)}.node.done.b{fill:#fbf0d9;stroke:var(--b)}
+.connection{fill:none;stroke-width:4;stroke-linecap:round;opacity:.82}.connection.a{stroke:var(--a)}.connection.b{stroke:var(--b)}
+.center{fill:#174e4f;stroke:#e6b75a;stroke-width:4}.center-text{fill:white;font-size:13px;font-weight:900;text-anchor:middle;dominant-baseline:middle}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stat{padding:12px;border-radius:13px;background:#f2f5f1}.stat.a{border-left:4px solid var(--a)}.stat.b{border-left:4px solid var(--b)}
+.stat strong{display:block;font-size:.88rem}.stat span{font-size:.8rem;color:var(--muted)}
+.dice-area{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.die{width:66px;height:66px;border-radius:16px;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-size:2.3rem;font-weight:900;box-shadow:0 4px 0 #dce4de}
+.dice-copy{flex:1;min-width:150px}.dice-copy strong{display:block}.dice-copy span{font-size:.84rem;color:var(--muted)}
+.message{margin-top:12px;border-radius:11px;padding:11px 13px;background:#edf4ee;color:#285540;font-size:.87rem;font-weight:700;min-height:43px}
+.message.warn{background:#fff3df;color:#795316}.message.win{background:#e8f5ec;color:#17633d}
+.rules{color:var(--muted);font-size:.85rem;line-height:1.55}.rules summary{cursor:pointer;color:var(--bg);font-weight:850}
+.rules ul{padding-left:20px;margin-bottom:0}
+@media(max-width:520px){main{padding:0 9px;margin-top:12px}.panel{border-radius:16px}.setup{grid-template-columns:1fr}.offline{display:none}.turn{align-items:flex-start;flex-direction:column}.dice-area{gap:10px}.die{width:58px;height:58px}.stats{gap:7px}.stat{padding:10px}}
+@media(prefers-reduced-motion:no-preference){.btn{transition:transform .12s ease}.btn:active{transform:scale(.98)}.connection{animation:draw .35s ease-out}@keyframes draw{from{stroke-dasharray:0 500}to{stroke-dasharray:500 0}}}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+</style>
+</head>
+<body>
+<header><div class="head"><a class="home" href="../../index.html">← Home</a><h1>Roll &amp; Connect</h1><span class="offline">● OFFLINE · AUTO-SAVE</span></div></header>
+<main>
+<section class="panel intro">
+<h2>A race to connect all six</h2>
+<p>Roll the dice and connect the matching number on your side to the centre. First player to connect 1–6 wins. Lines may cross — that's part of the game.</p>
+<div class="setup">
+<div><label for="nameA">Player 1</label><input id="nameA" maxlength="18" value="Player 1" autocomplete="off"></div>
+<div><label for="nameB">Player 2</label><input id="nameB" maxlength="18" value="Player 2" autocomplete="off"></div>
+</div>
+<div class="actions"><button class="btn secondary" id="newGame" type="button">New game</button><button class="btn warn" id="resetNames" type="button">Reset names</button></div>
+</section>
+<section class="panel">
+<div class="turn"><div><strong id="turnName">Player 1's turn</strong><br><small id="turnHint">Roll the dice to connect a number.</small></div><small id="turnCount">0 / 6 connected</small></div>
+<div class="board-wrap">
+<svg id="board" viewBox="0 0 360 430" role="img" aria-label="Two-player board with six numbered circles on each side and a centre target">
+<text x="90" y="24" text-anchor="middle" class="player-label" id="labelA">PLAYER 1</text>
+<text x="270" y="406" text-anchor="middle" class="player-label" id="labelB">PLAYER 2</text>
+<g id="linesA"></g><g id="linesB"></g>
+<circle class="center" cx="180" cy="215" r="30"></circle><text class="center-text" x="180" y="215">GOAL</text>
+<g id="nodesA"></g><g id="nodesB"></g>
+</svg>
+</div>
+<div class="stats">
+<div class="stat a"><strong id="statNameA">Player 1</strong><span id="statA">0 of 6 connected</span></div>
+<div class="stat b"><strong id="statNameB">Player 2</strong><span id="statB">0 of 6 connected</span></div>
+</div>
+</section>
+<section class="panel">
+<div class="dice-area"><div class="die" id="die" aria-label="Dice result">⚄</div><div class="dice-copy"><strong id="rollTitle">Ready to roll?</strong><span id="rollDescription">Take turns. Each player has their own 1–6.</span></div><button class="btn" id="roll" type="button">Roll dice</button></div>
+<div class="message" id="message" role="status" aria-live="polite">Player 1 starts. Good luck!</div>
+<div class="actions"><button class="btn secondary" id="undo" type="button">Undo last turn</button><button class="btn secondary" id="pass" type="button">Pass turn</button></div>
+</section>
+<section class="panel rules"><details><summary>How to play</summary><ul>
+<li>Players take turns rolling one six-sided die.</li><li>Connect the rolled number from your own side to the centre.</li><li>Each player has an independent set of numbers. Connecting 3 for one player does not affect the other player's 3.</li><li>If you roll a number you have already connected, your turn is skipped.</li><li>Lines can cross freely. The first player to connect all six numbers wins.</li>
+</ul></details></section>
+</main>
+<script>
+(() => {
+'use strict';
+const KEY='scorepad.rollConnect.v1';
+const positionsA=[1,2,3,4,5,6].map((n)=>({n,x:50,y:62+(n-1)*58}));
+const positionsB=[1,2,3,4,5,6].map((n)=>({n,x:310,y:62+(n-1)*58}));
+const $=id=>document.getElementById(id);
+const empty=()=>({names:['Player 1','Player 2'],connected:[[],[]],turn:0,history:[],lastRoll:null,winner:null});
+let state=empty();
+const dice=['⚀','⚁','⚂','⚃','⚄','⚅'];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){}}
+function esc(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function name(i){return state.names[i]||('Player '+(i+1));}
+function makeNodes(target,positions,player){
+$(target).innerHTML=positions.map(p=>'<g><circle class="node '+(state.connected[player].includes(p.n)?'done '+(player===0?'a':'b'):'')+'" cx="'+p.x+'" cy="'+p.y+'" r="17"></circle><text class="node-text" x="'+p.x+'" y="'+p.y+'">'+p.n+'</text></g>').join('');
+}
+function makeLines(target,positions,player){
+$(target).innerHTML=state.connected[player].map(n=>{const p=positions.find(v=>v.n===n);return '<line class="connection '+(player===0?'a':'b')+'" x1="'+p.x+'" y1="'+p.y+'" x2="180" y2="215"></line>';}).join('');
+}
+function render(){
+$('nameA').value=state.names[0];$('nameB').value=state.names[1];
+$('labelA').textContent=name(0).toUpperCase();$('labelB').textContent=name(1).toUpperCase();
+makeLines('linesA',positionsA,0);makeLines('linesB',positionsB,1);makeNodes('nodesA',positionsA,0);makeNodes('nodesB',positionsB,1);
+$('statNameA').textContent=name(0);$('statNameB').textContent=name(1);
+$('statA').textContent=state.connected[0].length+' of 6 connected';$('statB').textContent=state.connected[1].length+' of 6 connected';
+$('turnName').textContent=state.winner!==null?name(state.winner)+' wins!':name(state.turn)+"'s turn";
+$('turnHint').textContent=state.winner!==null?'Game complete. Start a new game to play again.':'Roll the dice to connect a number.';
+$('turnCount').textContent=(state.winner===null?state.connected[state.turn].length:state.connected[state.winner].length)+' / 6 connected';
+$('roll').disabled=state.winner!==null;$('pass').disabled=state.winner!==null;$('undo').disabled=state.history.length===0;
+$('roll').textContent=state.winner!==null?'Game over':'Roll dice';
+if(state.lastRoll!==null){$('die').textContent=dice[state.lastRoll-1];}else{$('die').textContent='⚄';}
+if(state.winner!==null){$('rollTitle').textContent='Game complete';$('rollDescription').textContent=name(state.winner)+' connected all six numbers.';}
+else{$('rollTitle').textContent=state.lastRoll?'Last roll: '+state.lastRoll:'Ready to roll?';$('rollDescription').textContent='Take turns. Each player has their own 1–6.';}
+save();
+}
+function message(text,kind=''){const el=$('message');el.textContent=text;el.className='message'+(kind?' '+kind:'');}
+function snapshot(){return JSON.parse(JSON.stringify({names:state.names,connected:state.connected,turn:state.turn,lastRoll:state.lastRoll,winner:state.winner}));}
+function roll(){
+if(state.winner!==null)return;
+state.history.push(snapshot());
+const result=Math.floor(Math.random()*6)+1;state.lastRoll=result;
+const player=state.turn,already=state.connected[player].includes(result);
+if(already){
+message(name(player)+' rolled '+result+', which is already connected. Turn skipped.','warn');
+state.turn=1-player;
+}else{
+state.connected[player].push(result);
+if(state.connected[player].length===6){state.winner=player;message(name(player)+' connected all six numbers and wins!','win');}
+else{message(name(player)+' rolled '+result+' and connected it to the centre.');state.turn=1-player;}
+}
+render();
+}
+function pass(){
+if(state.winner!==null)return;
+state.history.push(snapshot());message(name(state.turn)+' passed the turn.','warn');state.turn=1-state.turn;render();
+}
+function undo(){
+if(!state.history.length)return;
+const previous=state.history.pop();state.names=previous.names;state.connected=previous.connected;state.turn=previous.turn;state.lastRoll=previous.lastRoll;state.winner=previous.winner;message('Last turn undone.');render();
+}
+function newGame(){
+if(!confirm('Start a new game? Current progress will be cleared.'))return;
+const names=[state.names[0],state.names[1]];state=empty();state.names=names;message(name(0)+' starts. Good luck!');render();
+}
+$('roll').addEventListener('click',roll);$('pass').addEventListener('click',pass);$('undo').addEventListener('click',undo);$('newGame').addEventListener('click',newGame);
+$('resetNames').addEventListener('click',()=>{state.names=['Player 1','Player 2'];render();message('Player names reset.');});
+['nameA','nameB'].forEach((id,i)=>$(id).addEventListener('change',e=>{state.names[i]=e.target.value.trim()||('Player '+(i+1));render();}));
+try{
+const raw=localStorage.getItem(KEY);
+if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed.names)&&parsed.names.length===2&&Array.isArray(parsed.connected)&&parsed.connected.length===2&&parsed.connected.every(a=>Array.isArray(a)&&a.every(n=>Number.isInteger(n)&&n>=1&&n<=6))&&[0,1].includes(parsed.turn)){state={...empty(),...parsed};state.connected=parsed.connected.map(a=>[...new Set(a)]);state.history=Array.isArray(parsed.history)?parsed.history:[];}}
+}catch(_){state=empty();}
+render();
+})();
+</script>
+<script>
+if('serviceWorker'in navigator&&location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('../../sw.js').catch(()=>{}));}
+</script>
+</body></html>
