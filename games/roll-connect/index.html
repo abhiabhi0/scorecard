@@ -125,10 +125,11 @@ $('roll').hidden=state.pendingRoll!==null;
 $('action').hidden=state.pendingRoll===null||rolling;
 $('action').disabled=rolling;
 $('action').textContent=state.pendingRoll!==null&&state.connected[state.turn].includes(state.pendingRoll)?'Skip turn':'Connect '+(state.pendingRoll??'');
-$('undo').disabled=state.history.length===0||rolling;
+$('undo').disabled=state.history.length===0||rolling;$('newGame').disabled=rolling;
 $('roll').textContent=state.winner!==null?'Finished':'🎲 Roll';
 if(state.lastRoll!==null){$('die').textContent=dice[state.lastRoll-1];}else{$('die').textContent='⚄';}
 if(state.winner!==null){$('rollDescription').textContent=name(state.winner)+' wins! All six connected.';}
+else if(state.pendingRoll!==null){$('rollDescription').textContent='Result: '+state.pendingRoll+' · confirm the action to continue';}
 else if(state.lastRoll){$('rollDescription').textContent='Last roll: '+state.lastRoll+' · '+name(state.turn)+' next';}
 else{$('rollDescription').textContent='Roll to connect your number to the centre.';}
 save();
